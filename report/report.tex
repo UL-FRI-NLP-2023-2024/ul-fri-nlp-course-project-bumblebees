@@ -101,6 +101,21 @@ Tu nekoliko opišemo SBERT - predvsem glede sentence embeddingov, ki jih potrebu
 TSDAE - opis metode, pri čemer se predvsem osredotočimo na domain adaptation. Povemo kateri model finetunamo.
 Dodamo skico arhitekture.
 
+Transformer-based Sequential Denoising Auto-Encoder (TSDAE) is a state-of-the-art unsupervised method used for domain adaptation with an encoder-decoder architecture. A shortcoming of previous sentence embedding techniques like SBERT is the lack of domain knowledge. Fine-tuning a model like this with TSDAE can adapt our model to a specific domain without any labeled data, as this is hard and expensive to acquire~\cite{wang-etal-2021-tsdae-using}. 
+
+Before training the model, TSDAE corrupts the input sentences, for example by deleting or swapping words, and encodes them to a fixed vector.The goal of the decoder is to reconstruct the vectors to the original input by prediciting what was changed. It is important to note that the decoder has no context as it doesn't have access to other sentence embeddings and thus creates a bottleneck~\cite{wang-etal-2021-tsdae-using}.  This architecture can be seen on figure \ref{fig:tsdae}.
+
+\begin{figure}[ht]\centering
+	\includegraphics[width=\linewidth]{TSDAEdiagram.png}
+	\caption{Architecture of TSDAE model}
+	\label{fig:tsdae}
+\end{figure}
+
+For the purpose of classifying Slovenian sentences based on their sentiment we fine-tune the SBERT model with TSDAE. We choose bert-base-uncased (TODO) for our base model to fine-tune. For the loss function we use the DenoisingAutoEncoderLoss as our loss function when training. We train the method and compare our results with the corpus.
+
+
+TSDAE has been shown by Wang, Reimers and Gurevych \cite{wang-etal-2021-tsdae-using} to outperform other unsupervised approaches and other supervised models, trained with a lot of labeled data. Many previous works were evaluated on Semantic Textual Similarity (STS) which might return good performance but it is unclear how it performs on specific domains. 
+
 
 \subsection*{GPL}
 GPL - opis metode, pri čemer se predvsem osredotočimo na domain adaptation. Povemo kateri model finetunamo.
