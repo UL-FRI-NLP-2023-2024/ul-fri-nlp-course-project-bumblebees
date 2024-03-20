@@ -1,3 +1,3 @@
-# Natural language processing course 2023/24: `Put name of your project here`
+# Natural language processing course 2023/24: `Unsupervised Domain adaptation for Sentence Classification`
 
-Please, organize README and the whole structure of the repository to be self-contained and reproducible.
+Testing two domain adaptation techniques: TSDAE (Transformer-based Sequential Denoising Auto-Encoder) and GPL (Generative Pseudo Labeling) on the SentiNews classification dataset.
