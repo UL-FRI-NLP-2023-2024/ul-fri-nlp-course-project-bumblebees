@@ -118,11 +118,13 @@ Dodamo skico arhitekture.
 
 Transformer-based Sequential Denoising Auto-Encoder (TSDAE) is a state-of-the-art unsupervised method used for domain adaptation with an encoder-decoder architecture. A shortcoming of previous sentence embedding techniques like SBERT is the lack of domain knowledge. Fine-tuning a model like this with TSDAE can adapt our model to a specific domain without any labeled data, as this is hard and expensive to acquire~\cite{wang-etal-2021-tsdae-using}. 
 
-Before training the model, TSDAE corrupts the input sentences, for example by deleting or swapping words, and encodes them to a fixed vector.The goal of the decoder is to reconstruct the vectors to the original input by prediciting what was changed. It is important to note that the decoder has no context as it doesn't have access to other sentence embeddings and thus creates a bottleneck~\cite{wang-etal-2021-tsdae-using}.  This architecture can be seen on figure \ref{fig:tsdae}.
+Before training the model, TSDAE corrupts the input sentences, for example by deleting or swapping words, and encodes them to a fixed vector. The goal of the decoder is to reconstruct the vectors to the original input by prediciting what was changed. It is important to note that the decoder has no context as it doesn't have access to other sentence embeddings and thus creates a bottleneck~\cite{wang-etal-2021-tsdae-using}. This architecture can be seen in Figure~\ref{fig:tsdae}.
 
 \begin{figure}[ht]\centering
-	\includegraphics[width=\linewidth]{TSDAEdiagram.png}
-	\caption{Architecture of TSDAE model}
+	\vspace{12 pt}
+	\includegraphics[width=\linewidth]{TSDAE_scheme.pdf}
+	\vspace{5 pt}
+	\caption{Architecture of TSDAE model.}
 	\label{fig:tsdae}
 \end{figure}
 
@@ -138,7 +140,15 @@ GPL - opis metode, pri čemer se predvsem osredotočimo na domain adaptation. Po
 Dodamo skico arhitekture.
 \fi
 
-The Generative Pseudo Labeling (GPL) is a domain adaptation technique that utilizes unsupervised learning. It allows us to fine-tune a dense retrieval model (for example SBERT \cite{SBERT}) on a desired domain. First step of GPL is preparing (query, sentence)-pairs. This takes three phases: generating suitable queries, negative mining and using cross-encoder to assign a score to each pair \cite{GPL}.
+The Generative Pseudo Labeling (GPL) is a domain adaptation technique that utilizes unsupervised learning. It allows us to fine-tune a dense retrieval model (for example SBERT \cite{SBERT}) on a desired domain. First step of GPL is preparing (query, sentence)-pairs. This takes three phases: generating suitable queries, negative mining and using cross-encoder to assign a score to each pair \cite{GPL}. This process is visualised in Figure~\ref{fig:GPL}.
+
+\begin{figure}[ht]\centering
+	\vspace{12 pt}
+	\includegraphics[width=\linewidth]{GPL_data_preprocessing.pdf}
+	\vspace{5 pt}
+	\caption{The workflow of GPL's sentence preparation step. Queries $Q$ are generated for each input sentence $P^{+}$. The generated queries are then used for negative mining or finding similar sentences $P^{-}$. Pseudo labeling step involves a cross-encoder that assigns a score to each (query, sentence)-pair.}
+	\label{fig:GPL}
+\end{figure}
 
 Queries are generated using a pretrained T5 encoder-decoder model \cite{T5}. Three queries are generated for each input sentence. The next step is negative mining, where 50 of the most similar sentences are retrieved for each of the generated queries, using an existing dense retrieval model. The (query, input sentence)-pairs are denoted as $(Q, P^{+})$ and the negative sentence as $P^{-}$.
 
