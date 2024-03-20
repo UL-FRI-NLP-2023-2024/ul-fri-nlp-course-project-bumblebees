@@ -106,6 +106,8 @@ Dodamo skico arhitekture.
 GPL - opis metode, pri čemer se predvsem osredotočimo na domain adaptation. Povemo kateri model finetunamo.
 Dodamo skico arhitekture.
 
+The Generative Pseudo Labeling (GPL) \cite{GPL} is a domain adaptation technique that utilizes unsupervised learning. It allows us to fine-tune a dense retrieval model (for example SBERT) on a desired domain. First step of GPL is preparing (query, sentence)-pairs. This takes three phases: generating suitable queries, negative mining and using cross-encoder to assign a score to each pair.
+
 
 \subsection*{Data}
 Kakšne podatke uporabljamo, kako izgledajo, in what way did you prepare the data, delitev na množice (poudarimo, da se vse metode treniranjo z enako učno množico).
