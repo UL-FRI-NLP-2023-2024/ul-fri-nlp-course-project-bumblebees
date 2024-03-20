@@ -41,7 +41,7 @@
 \PaperTitle{Unsupervised Domain adaptation for Sentence Classification} 
 
 % Authors (student competitors) and their info
-\Authors{Veronika Matek, Karmen Frank, and Luka Mihelič}
+\Authors{Veronika Matek, Karmen Frank and Luka Mihelič}
 
 % Advisors
 \affiliation{\textit{Advisors: Slavko Žitnik, Aleš Žagar, Boshko Koloski}}
@@ -88,7 +88,14 @@ The abstract goes here. The abstract goes here. The abstract goes here. The abst
 	scientific work conducted by other researchers.
 \fi
 
-Previous state-of-the-art methods, like SBERT, for deriving sentence embeddings have a key problem of not working for specific topics and domains. We bypass this problem by additionally fine-tuning our non-domain-specific base model using methods like TSDAE and GPL. In this report we fine-tune an unsupervised base model SBERT with the mentioned methods for the classification of Slovenian sentences based on their sentiment. We compare the results between before and after fine-tuning the base model using labeled data and observe the impact of different parameters during the learning of each approach.
+Previous state-of-the-art methods, like SBERT, for deriving sentence embeddings have a key problem of not working for specific topics and domains. We bypass this problem by additionally fine-tuning our non-domain-specific base model using methods like TSDAE and GPL. Both of the methods have been proven to significantly outperform previous state-of-the-art models, like Masked Language Model, on domain specific training data, working even better if combined together~\cite{wang-etal-2021-tsdae-using, GPL}. 
+
+Most of these previous successful methods were trained on Semantic Textual Similarity, which doesn't require any domain knowledge. Some examples of these approaches are SBERT and Infersent. One such reason for the lack of domain knowledge is that training a model might require a lot of labeled data, which can be expensive and hard to get. This holds true especially for specific topics. One way of solving this is instead training the model on the general corpus before fine-tuning it to the required domain~\cite{wang-etal-2021-tsdae-using, GPL}..
+
+
+In this report we aim to fine-tune an unsupervised base model SBERT with two of the mentioned domain adaptation techniques, namely Transformer-based Sequential Denoising Auto-Encoder (TSDAE)  and Generative Pseudo Labeling (GPL) on the SentiNews classification dataset. We classify Slovenian sentences based on their sentiment, which can be positive, neutral or negative. We compare the results given by the pretrained base model and by the base model fine-tuned with both mentioned methods as well as a combination of them. 
+
+We observe any improvement when faced with domain specific data compared to SBERT, trained on the exact same input sentences. We also distinguish the impact of different parameters during the learning of each approach and try to find the optimums.
 
 
 %------------------------------------------------
@@ -118,13 +125,13 @@ Dodamo skico arhitekture.
 
 Transformer-based Sequential Denoising Auto-Encoder (TSDAE) is a state-of-the-art unsupervised method used for domain adaptation with an encoder-decoder architecture. A shortcoming of previous sentence embedding techniques like SBERT is the lack of domain knowledge. Fine-tuning a model like this with TSDAE can adapt our model to a specific domain without any labeled data, as this is hard and expensive to acquire~\cite{wang-etal-2021-tsdae-using}. 
 
-Before training the model, TSDAE corrupts the input sentences, for example by deleting or swapping words, and encodes them to a fixed vector. The goal of the decoder is to reconstruct the vectors to the original input by prediciting what was changed. It is important to note that the decoder has no context as it doesn't have access to other sentence embeddings and thus creates a bottleneck~\cite{wang-etal-2021-tsdae-using}. This architecture can be seen in Figure~\ref{fig:tsdae}.
+Before training the model, TSDAE corrupts the input sentences, for example by deleting or swapping words, and encodes them to a fixed size vector. The goal of the decoder is to reconstruct the vectors to the original input by prediciting what was changed. It is important to note that the decoder has no context as it doesn't have access to other sentence embeddings and thus creates a bottleneck~\cite{wang-etal-2021-tsdae-using}. This architecture can be seen in Figure~\ref{fig:tsdae}.
 
 \begin{figure}[ht]\centering
 	\vspace{12 pt}
 	\includegraphics[width=\linewidth]{TSDAE_scheme.pdf}
 	\vspace{5 pt}
-	\caption{Architecture of TSDAE model.}
+	\caption{Workflow of TSDAE. The input sentences are first corrupted and then the encoded into fixed vectors. The vectors are pooled and then attempted to be reconstructed with the decoder.}
 	\label{fig:tsdae}
 \end{figure}
 
