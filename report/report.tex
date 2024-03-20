@@ -77,6 +77,8 @@ The abstract goes here. The abstract goes here. The abstract goes here. The abst
 %----------------------------------------------------------------------------------------
 
 \section*{Introduction}
+
+\iffalse	
 	Uvodni zapis - slabosti SBERT-a in podobnih metod, zakaj se uporablja TSDAE in GPL (v povezavi s prilagoditvijo domene). Osredotočili se bomo na "domain adaptation" za slovenski jezik, pri čemer bomo metode testirali nad problemom "sentimental analysis" (nekako povežemo besedilo na problem klasifikacija pri čustvih). Cilj projekta je bila implementacija metod TSDAE, GPL, s katerimi finetunamo SBERT (BERT+pooling), in testiranje metod ter primerjava rezultatov nad problemom klasifikacije stavkov v eno izmed "pos", "neg", "neutral". Opazovali smo tudi izbrane parametre tekom učenja posameznega pristopa.
 
 	In the Introduction section you should write about the
@@ -84,6 +86,9 @@ The abstract goes here. The abstract goes here. The abstract goes here. The abst
 	what will we solve) and about related work (what solutions
 	for the problem already exist). Where appropriate, reference
 	scientific work conducted by other researchers.
+\fi
+
+Previous state-of-the-art methods, like SBERT, for deriving sentence embeddings have a key problem of not working for specific topics and domains. We bypass this problem by additionally fine-tuning our non-domain-specific base model using methods like TSDAE and GPL. In this report we fine-tune an unsupervised base model SBERT with the mentioned methods for the classification of Slovenian sentences based on their sentiment. We compare the results between before and after fine-tuning the base model using labeled data and observe the impact of different parameters during the learning of each approach.
 
 
 %------------------------------------------------
@@ -91,11 +96,11 @@ The abstract goes here. The abstract goes here. The abstract goes here. The abst
 
 \section*{Methods}
 
-
+\iffalse	
 Use the Methods section to describe what you did an how you did it -- in what way did you prepare the data, what algorithms did you use, how did you test various solutions ... Provide all the required details for a reproduction of your work.
 
 Tu nekoliko opišemo SBERT - predvsem glede sentence embeddingov, ki jih potrebujemo za naprej.
-
+\fi
 
 \subsection*{SBERT}
 SBERT (Sentence Bidirectional Encoder Representations from Transformers) adds siamese and triplet structure networks to the pre-trained transformer network BERT, which produces new state-of-the-art results for NLP tasks such as question answering, sentence classification and sentence-pair regression. SBERT applies a pooling layer to the output of a BERT/RoBERT model, deriving fixed sized sentence embeddings. With the added network structures we can fine-tune the model and update weights so the to output results are sentence embeddings that are semantically meaningful. Semantict aspects embedded in the continuous vector space can be measured with the cosine metric similarity, where similar semantic representations in a high-dimensional vector space are closer to each other. The available training data for a given knowledge domain also defines the SBERT network structure. Therefore we may use the classification, regression or the triplet objective function for different kind of tasks.
@@ -106,8 +111,10 @@ Such fine-tuning seeks to produce a fixed sized sentence embedding,
 
 
 \subsection*{TSDAE}
+\iffalse
 TSDAE - opis metode, pri čemer se predvsem osredotočimo na domain adaptation. Povemo kateri model finetunamo.
 Dodamo skico arhitekture.
+\fi
 
 Transformer-based Sequential Denoising Auto-Encoder (TSDAE) is a state-of-the-art unsupervised method used for domain adaptation with an encoder-decoder architecture. A shortcoming of previous sentence embedding techniques like SBERT is the lack of domain knowledge. Fine-tuning a model like this with TSDAE can adapt our model to a specific domain without any labeled data, as this is hard and expensive to acquire~\cite{wang-etal-2021-tsdae-using}. 
 
@@ -126,8 +133,10 @@ TSDAE has been shown by Wang, Reimers and Gurevych \cite{wang-etal-2021-tsdae-us
 
 
 \subsection*{GPL}
+\iffalse
 GPL - opis metode, pri čemer se predvsem osredotočimo na domain adaptation. Povemo kateri model finetunamo.
 Dodamo skico arhitekture.
+\fi
 
 The Generative Pseudo Labeling (GPL) is a domain adaptation technique that utilizes unsupervised learning. It allows us to fine-tune a dense retrieval model (for example SBERT \cite{SBERT}) on a desired domain. First step of GPL is preparing (query, sentence)-pairs. This takes three phases: generating suitable queries, negative mining and using cross-encoder to assign a score to each pair \cite{GPL}.
 
