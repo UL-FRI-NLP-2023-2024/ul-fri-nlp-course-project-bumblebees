@@ -137,6 +137,9 @@ Before training the model, TSDAE corrupts the input sentences, for example by de
 	\label{fig:tsdae}
 \end{figure}
 
+Previous approaches, like MLM 
+This approach also outperforms methods like MLM which utilized multiple CLS token vector embeddings in favour of producing a single vector embedding. This is because instead of applying CLS pooling on token vectors, TSDAE applies mean pooling that takes the average value across all token vectors to create a sentence vector ~\cite{pineconetsdae}.
+
 For the purpose of classifying Slovenian sentences based on their sentiment we fine-tune the SBERT model with TSDAE. We choose bert-base-uncased (TODO) for our base model. During training we use the DenoisingAutoEncoderLoss as our loss function when training. We train the method and compare our results with the corpus.
 
 
