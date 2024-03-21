@@ -92,7 +92,7 @@ Previous state-of-the-art methods, like SBERT, for deriving sentence embeddings 
 
 Most of these previous successful methods were trained on Semantic Textual Similarity, which does not take into account any domain knowledge. Some examples of these approaches are SBERT and Infersent. One such reason for the lack of domain knowledge is that training a model might require a lot of labeled data, which can be expensive and hard to get. This holds true especially for specific topics. One way of solving this is training the model on the general corpus before fine-tuning it to the required domain~\cite{wang-etal-2021-tsdae-using, GPL}.
 
-In this report we aim to fine-tune an unsupervised base model SBERT with two of the mentioned domain adaptation techniques, namely Transformer-based Sequential Denoising Auto-Encoder (TSDAE) and Generative Pseudo Labeling (GPL) on the SentiNews classification dataset. We classify Slovenian sentences based on their sentiment, which can be positive, neutral or negative. We compare the results given by the pretrained base model and by the base model fine-tuned with both mentioned methods as well as a combination of them. 
+In this report we aim to fine-tune an unsupervised multilingual base model SBERT with two of the mentioned domain adaptation techniques, namely Transformer-based Sequential Denoising Auto-Encoder (TSDAE) and Generative Pseudo Labeling (GPL) on the SentiNews classification dataset. We classify Slovenian sentences based on their sentiment, which can be positive, neutral or negative. We compare the results given by the pretrained base model and by the base model fine-tuned with both mentioned methods as well as a combination of them. 
 
 We observe any improvement when faced with domain specific data compared to SBERT, trained on the exact same input sentences. We also distinguish the impact of different parameters during the learning of each approach and try to find the optimums.
 
@@ -111,7 +111,7 @@ Tu nekoliko opišemo SBERT - predvsem glede sentence embeddingov, ki jih potrebu
 \fi
 
 \subsection*{SBERT}
-SBERT (Sentence Bidirectional Encoder Representations from Transformers) adds siamese and triplet structure networks to the pre-trained transformer network BERT, which produces state-of-the-art results for natural language processing tasks such as question answering, sentence classification and sentence-pair regression. SBERT applies a pooling layer to the output of a BERT/RoBERT model, deriving fixed sized sentence embeddings. With the added network structures we can fine-tune the model and update weights so the to output results are sentence embeddings that are semantically meaningful \cite{SBERT}. Semantic aspects embedded in the continuous vector space can be measured with the cosine metric similarity, where similar semantic representations in a high-dimensional vector space are closer to each other. The available training data for a given knowledge domain also defines the SBERT network structure. Therefore we may use the classification, regression or the triplet objective function for different kind of tasks.
+SBERT (Sentence Bidirectional Encoder Representations from Transformers) adds siamese and triplet structure networks to the pre-trained transformer network BERT, which produces state-of-the-art results for natural language processing tasks such as question answering, sentence classification and sentence-pair regression. SBERT applies a pooling layer to the output of a BERT/RoBERTa model, deriving fixed sized sentence embeddings. With the added network structures we can fine-tune the model and update weights so the to output results are sentence embeddings that are semantically meaningful \cite{SBERT}. Semantic aspects embedded in the continuous vector space can be measured with the cosine metric similarity, where similar semantic representations in a high-dimensional vector space are closer to each other. The available training data for a given knowledge domain also defines the SBERT network structure. Therefore we may use the classification, regression or the triplet objective function for different kind of tasks.
 
 The classification objective function concatenates sentence embeddings \(u\) and \(v\) with the element-wise difference \(|u - v|\) and multiply it with the trainable weight \(x_1\) \( W_t \in \mathbb{R}^{3n \times k} \) \cite{SBERT}:
 
@@ -135,7 +135,7 @@ Before training the model, TSDAE corrupts the input sentences, for example by de
 	\label{fig:tsdae}
 \end{figure}
 
-For the purpose of classifying Slovenian sentences based on their sentiment we fine-tune the SBERT model with TSDAE. We choose bert-base-uncased (TODO) for our base model. During training we use the DenoisingAutoEncoderLoss as our loss function when training. We train the method and compare our results with the corpus.
+For the purpose of classifying Slovenian sentences based on their sentiment we fine-tune the SBERT model with TSDAE. We choose bert-base-uncased (TODO: change base model accordingly) for our base model. During training we use the DenoisingAutoEncoderLoss as our loss function, which expects pairs of original and corrupted sentences as the input. We train the model where the decoder attempts the reconstruction of the corrupted sentences and compare our results with the corpus~\cite{SentenceTransformers}.
 
 % TSDAE has been shown by Wang, Reimers and Gurevych \cite{wang-etal-2021-tsdae-using} to outperform other unsupervised approaches and other supervised models, trained with a lot of labeled data. Many previous works were evaluated on Semantic Textual Similarity (STS) which might return good performance but it is unclear how it performs on specific domains \cite{wang-etal-2021-tsdae-using}.
 
@@ -170,16 +170,20 @@ where $N$ is the batch size, $\delta_i$ is defined in equation~\ref{eq:delta}, p
 
 
 \subsection*{Data}
-We used the SentiNews dataset \cite{sentiNews}, which contains x (TODO:število) sentences, equiped with sentiment labels, in the Slovenian language. A few examples of dataset's elements are shown in Table~\ref{table1}.
+We used the SentiNews dataset \cite{sentiNews}, which contains 169k sentences from 10.4k documents, equiped with sentiment labels, in the Slovenian language. A few examples of dataset's elements are shown in Table~\ref{tab1}.
 
-\begin{table}
+\begin{table}[!h]
+	\footnotesize
 	\begin{center}
 		\begin{tabular}{ |c|c| } 
 		\hline
 		Sentence & Sentiment \\
 		\hline
-		to be added & to be added\\
-		to be added & to be added\\
+		
+		Kaže, da se blejskim vilam vendarle obeta lepša prihodnost. & positive \\
+		O tem bo Evropska komisija odločala septembra. &neutral\\
+		V Sloveniji je ta rast znašala sedem odstotkov. &negative\\
+		
 		\hline
 		\end{tabular}
 	\end{center}
@@ -187,7 +191,7 @@ We used the SentiNews dataset \cite{sentiNews}, which contains x (TODO:število)
 \label{tab1}
 \end{table}
 
-The dataset was split into train, validation and test set (TO DO).
+The dataset was split into train, validation and test set (TO DO). For each method we use to fine-tune the base model, the exact same data sets are used.
 Kakšne podatke uporabljamo, kako izgledajo, in what way did you prepare the data, delitev na množice (poudarimo, da se vse metode treniranjo z enako učno množico).
 Pokažemo morda par primerov povedi v tabeli.
 
