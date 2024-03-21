@@ -110,12 +110,24 @@ Tu nekoliko opišemo SBERT - predvsem glede sentence embeddingov, ki jih potrebu
 \fi
 
 \subsection*{SBERT}
-SBERT (Sentence Bidirectional Encoder Representations from Transformers) adds siamese and triplet structure networks to the pre-trained transformer network BERT, which produces new state-of-the-art results for natural language processing tasks such as question answering, sentence classification and sentence-pair regression. SBERT applies a pooling layer to the output of a BERT/RoBERT model, deriving fixed sized sentence embeddings. With the added network structures we can fine-tune the model and update weights so the to output results are sentence embeddings that are semantically meaningful. Semantic aspects embedded in the continuous vector space can be measured with the cosine metric similarity, where similar semantic representations in a high-dimensional vector space are closer to each other. The available training data for a given knowledge domain also defines the SBERT network structure. Therefore we may use the classification, regression or the triplet objective function for different kind of tasks.
+SBERT (Sentence Bidirectional Encoder Representations from Transformers) adds siamese and triplet structure networks to the pre-trained transformer network BERT, which produces state-of-the-art results for natural language processing tasks such as question answering, sentence classification and sentence-pair regression. SBERT applies a pooling layer to the output of a BERT/RoBERT model, deriving fixed sized sentence embeddings. With the added network structures we can fine-tune the model and update weights so the to output results are sentence embeddings that are semantically meaningful \cite{SBERT}. Semantic aspects embedded in the continuous vector space can be measured with the cosine metric similarity, where similar semantic representations in a high-dimensional vector space are closer to each other. The available training data for a given knowledge domain also defines the SBERT network structure. Therefore we may use the classification, regression or the triplet objective function for different kind of tasks.
 
-CO concatenates the sentence embeddings 
+The classification objective function concatenates sentence embeddings \(u\) and \(v\) with the element-wise difference \(|u - v|\) and multiply it with the trainable weight \(x_1\) \( W_t \in \mathbb{R}^{3n \times k} \) \cite{SBERT}:
 
-Such fine-tuning seeks to produce a fixed sized sentence embedding, 
+\begin{equation}
+o = \text{softmax}(W_t(u, v, |u - v|))
+\label{eq:softmax}
+\end{equation}
 
+% \begin{figure}[ht]\centering
+% 	\vspace{12 pt}
+% 	\includegraphics[width=\linewidth]{sbert_class.pdf}
+% 	\vspace{5 pt}
+% 	\caption{Workflow of TSDAE. The input sentences are first corrupted and then the encoded into fixed sized vectors. The vectors are pooled and then attempted to be reconstructed with the decoder.}
+% 	\label{fig:tsdae}
+% \end{figure}
+
+As seen on Figure 1, the BERT weights are tied, forming a siamese network structure.
 
 \subsection*{TSDAE}
 \iffalse
@@ -138,7 +150,7 @@ Before training the model, TSDAE corrupts the input sentences, for example by de
 For the purpose of classifying Slovenian sentences based on their sentiment we fine-tune the SBERT model with TSDAE. We choose bert-base-uncased (TODO) for our base model. During training we use the DenoisingAutoEncoderLoss as our loss function when training. We train the method and compare our results with the corpus.
 
 
-TSDAE has been shown by Wang, Reimers and Gurevych \cite{wang-etal-2021-tsdae-using} to outperform other unsupervised approaches and other supervised models, trained with a lot of labeled data. Many previous works were evaluated on Semantic Textual Similarity (STS) which might return good performance but it is unclear how it performs on specific domains. 
+TSDAE has been shown by Wang, Reimers and Gurevych \cite{wang-etal-2021-tsdae-using} to outperform other unsupervised approaches and other supervised models, trained with a lot of labeled data. Many previous works were evaluated on Semantic Textual Similarity (STS) which might return good performance but it is unclear how it performs on specific domains \cite{wang-etal-2021-tsdae-using}. 
 
 
 \subsection*{GPL}
