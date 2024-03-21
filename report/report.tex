@@ -119,16 +119,6 @@ o = \text{softmax}(W_t(u, v, |u - v|))
 \label{eq:softmax}
 \end{equation}
 
-% \begin{figure}[ht]\centering
-% 	\vspace{12 pt}
-% 	\includegraphics[width=\linewidth]{sbert_class.pdf}
-% 	\vspace{5 pt}
-% 	\caption{Workflow of TSDAE. The input sentences are first corrupted and then the encoded into fixed sized vectors. The vectors are pooled and then attempted to be reconstructed with the decoder.}
-% 	\label{fig:tsdae}
-% \end{figure}
-
-As seen on Figure 1, the BERT weights are tied, forming a siamese network structure.
-
 \subsection*{TSDAE}
 \iffalse
 TSDAE - opis metode, pri čemer se predvsem osredotočimo na domain adaptation. Povemo kateri model finetunamo.
