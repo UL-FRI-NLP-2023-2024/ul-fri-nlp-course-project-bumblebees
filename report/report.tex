@@ -56,7 +56,7 @@
 %----------------------------------------------------------------------------------------
 
 \Abstract{
-The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here.
+TO BE ADDED LATER IN PROCESS.
 }
 
 %----------------------------------------------------------------------------------------
@@ -113,12 +113,14 @@ Tu nekoliko opišemo SBERT - predvsem glede sentence embeddingov, ki jih potrebu
 \subsection*{SBERT}
 SBERT (Sentence Bidirectional Encoder Representations from Transformers) adds siamese and triplet structure networks to the pre-trained transformer network BERT, which produces state-of-the-art results for natural language processing tasks such as question answering, sentence classification and sentence-pair regression. SBERT applies a pooling layer to the output of a BERT/RoBERTa model, deriving fixed sized sentence embeddings. With the added network structures we can fine-tune the model and update weights so the to output results are sentence embeddings that are semantically meaningful \cite{SBERT}. Semantic aspects embedded in the continuous vector space can be measured with the cosine metric similarity, where similar semantic representations in a high-dimensional vector space are closer to each other. The available training data for a given knowledge domain also defines the SBERT network structure. Therefore we may use the classification, regression or the triplet objective function for different kind of tasks.
 
-The classification objective function concatenates sentence embeddings \(u\) and \(v\) with the element-wise difference \(|u - v|\) and multiply it with the trainable weight \(x_1\) \( W_t \in \mathbb{R}^{3n \times k} \) \cite{SBERT}:
+The classification objective function concatenates sentence embeddings \(u\) and \(v\) with the element-wise difference \(|u - v|\) and multiplies it with the trainable weight \( W_t \in \mathbb{R}^{3n \times k} \) \cite{SBERT}:
 
 \begin{equation}
-o = \text{softmax}(W_t(u, v, |u - v|))
+o = \text{softmax}(W_t(u, v, |u - v|)) \text{,}
 \label{eq:softmax}
 \end{equation}
+
+where $n$ is the sentence embeddings' dimension and $k$ number of labels.
 
 
 \subsection*{TSDAE}
@@ -191,7 +193,7 @@ We used the SentiNews dataset \cite{sentiNews}, which contains 169k sentences fr
 \label{tab1}
 \end{table}
 
-The dataset was split into train, validation and test set (TO DO). For each method we use to fine-tune the base model, the exact same data sets are used.
+The dataset was split into train, validation and test set (TO DO). For each method we use to fine-tune the base model, the exact same datasets are used.
 Kakšne podatke uporabljamo, kako izgledajo, in what way did you prepare the data, delitev na množice (poudarimo, da se vse metode treniranjo z enako učno množico).
 Pokažemo morda par primerov povedi v tabeli.
 
