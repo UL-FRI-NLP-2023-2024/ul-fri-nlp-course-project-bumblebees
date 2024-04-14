@@ -1,7 +1,19 @@
 import numpy as np
 from datasets import load_dataset
 from torch.utils.data import Dataset
+import torch.nn as nn
 
+
+# TODO: preveriti moramo, ali je to primerno - samo en Linear
+class Classifier(nn.Module):
+    def __init__(self, input_dim, output_dim):
+        super().__init__()
+        self.linear = nn.Linear(input_dim, output_dim)
+    
+    def forward(self, x):
+        x = self.linear(x)
+        return x
+    
 
 # Custom dataset:
 class ClassifyingDataset(Dataset):
@@ -45,7 +57,7 @@ def prepare_dataset(train):
         val_text, val_labels = dataset['train']['content'][n_train:n_train+n_val], dataset['train']['sentiment'][n_train:n_train+n_val]
         train_labels = replace_labels(train_labels)
         val_labels = replace_labels(val_labels)
-        return train_text, train_labels, val_text, val_labels
+        return train_text, np.asarray(train_labels), val_text, np.asarray(val_labels)
     
     # Test set:
     test_text, test_labels = dataset['train']['content'][n_train+n_val:end], dataset['train']['sentiment'][n_train+n_val:end]

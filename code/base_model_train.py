@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader, Dataset
 import numpy as np
 from sklearn.metrics import f1_score
 
-from utils import prepare_dataset, ClassifyingDataset
+from utils import prepare_dataset, Classifier, ClassifyingDataset
 
 
 # Set parameters:
@@ -19,16 +19,6 @@ batch_size = 8
 # Determine device:
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Using device: ", device)
-
-# TODO: preveriti moramo, ali je to primerno - samo en Linear
-class Classifier(nn.Module):
-    def __init__(self, input_dim, output_dim):
-        super().__init__()
-        self.linear = nn.Linear(input_dim, output_dim)
-    
-    def forward(self, x):
-        x = self.linear(x)
-        return x
 
 
 def train(train_dataloader, val_dataloader, model, criterion, optimizer):
@@ -78,9 +68,9 @@ if __name__=='__main__':
     val_embds = base_model.encode(val_text)
 
     # Preparing DataLoaders:
-    train_dataset = ClassifyingDataset(train_embds, np.asarray(train_labels, dtype=float))
+    train_dataset = ClassifyingDataset(train_embds, train_labels)
     train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
-    val_dataset = ClassifyingDataset(val_embds, np.asarray(val_labels, dtype=float))
+    val_dataset = ClassifyingDataset(val_embds, val_labels)
     val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
     # Initializing classifying model, loss and optimizer:
