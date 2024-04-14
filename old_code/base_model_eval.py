@@ -7,8 +7,13 @@ import torch
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
 
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import precision_score, recall_score, accuracy_score, f1_score
 
+from utils import replace_labels
+import joblib
+
+
+# OPOZORILO: Tukaj je še nekaj stare kode od različnih testiranj!
 
 # Determine device:
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -31,27 +36,14 @@ n_val = round(0.1 * dataset_len)
 
 
 # Za potrebe testiranja malo zmanjšamo množice:
-train_text, train_labels = dataset['train']['content'][0:500], dataset['train']['sentiment'][0:500]
-test_text, test_labels = dataset['train']['content'][-100:], dataset['train']['sentiment'][-100:]
+test_text, test_labels = dataset['train']['content'][-500:], dataset['train']['sentiment'][-500:]
 
-def replace_labels(item):   #TODO: find a faster way
-    if isinstance(item, list):
-        return [replace_labels(subitem) for subitem in item]
-    else:
-        return labels.get(item)
-    
-labels = {'neutral': 0, 'negative': 1, 'positive': 2}
-train_labels = replace_labels(train_labels)
 test_labels = replace_labels(test_labels)
 
 
 # Loading model:
 model = SentenceTransformer("sentence-transformers/distiluse-base-multilingual-cased-v2")
 
-# Learn a classifier:
-embds = model.encode(train_text)
-classifier = LogisticRegression(max_iter=500)
-classifier.fit(embds, train_labels)
 
 # Evaluation:
 # for i, batch in enumerate(test_dataloader):
@@ -63,8 +55,21 @@ embeddings = model.encode(test_text) # test_text is a list of sentences, embeddi
 # embeddings = torch.from_numpy(embeddings).to(device) # size: n_examples * 512
 # print(type(embeddings), embeddings.size(), embeddings.device)
 
+classifier = joblib.load('classifiers/logistic_regression_base_model.pkl')
 test_pred = classifier.predict(embeddings)
-print(test_pred)
 
+# Different scores:
+precision = precision_score(test_labels, test_pred, average='weighted')
+recall = recall_score(test_labels, test_pred, average='weighted')
 accuracy = accuracy_score(test_labels, test_pred)
-print(accuracy)
+f1 = f1_score(test_labels, test_pred, average='weighted')
+print(f"Results on test set:\n  precision: {precision}\n  recall: {recall}\n  accuracy: {accuracy}\n  f1 score: {f1}")
+
+# Trenuten pristop (5000 učnih podatkov in 500 testnih) prinese naslednje rezultate:
+# Results on test set:
+#   precision: 0.6016000741358539
+#   recall: 0.566
+#   accuracy: 0.566
+#   f1 score: 0.47977081602056115
+
+# Morda bi bil boljši pristop, da po sentence embeddingu damo torch.Linear plast (512->3), jo natreniramo, nato pa uporabimo Softmax in vzamemo max kot napoved.
