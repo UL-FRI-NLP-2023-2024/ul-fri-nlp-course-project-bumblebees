@@ -57,7 +57,7 @@ print(type(train), len(train), train[0])
 # we use a dataloader as usual
 train_dataloader = DataLoader(train, batch_size=8, shuffle=True, drop_last=True)
 val_dataloader = DataLoader(validation, batch_size=1, shuffle=True, drop_last=True)
-test_dataloader = DataLoader(test, batch_size=1, shuffle=True, drop_last=True)
+test_dataloader = DataLoader(test, batch_size=1, shuffle=False, drop_last=False)
 
 # Bojda se tku dela ČE JE DATASET KKR DICTIONARY in ne pandas, če damo content in sentiment notr
 # sm na pavzi, ma nism na pavzi :)
