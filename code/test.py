@@ -19,11 +19,11 @@ output_dim = 3
 batch_size = 1
 
 
-def bm_predictions(test_text, test_labels):
+def bm_predictions(test_text, test_labels, model_name="sentence-transformers/distiluse-base-multilingual-cased-v2", model_path='classifiers/classifier_base_model.pth'):
     # Loading base model and its classifier:
-    base_model = SentenceTransformer("sentence-transformers/distiluse-base-multilingual-cased-v2")
+    base_model = SentenceTransformer(model_name)
     bm_classifier = Classifier(input_dim, output_dim).to(device)
-    bm_classifier.load_state_dict(torch.load('classifiers/classifier_base_model.pth'))
+    bm_classifier.load_state_dict(torch.load(model_path))
     bm_classifier.eval()
 
     # Computing test dataset encodings:
@@ -50,7 +50,7 @@ if __name__=='__main__':
 
     # Computing base models classifications:
     bm_predictions = bm_predictions(test_text, test_labels)
-    
+
     # Measuring performance:
     bm_precision = precision_score(test_labels, bm_predictions, average='weighted')
     bm_recall = recall_score(test_labels, bm_predictions, average='weighted')
