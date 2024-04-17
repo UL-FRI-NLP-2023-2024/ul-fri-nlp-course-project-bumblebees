@@ -14,34 +14,36 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Using device: ", device)
 
 # Set parameters:
-input_dim = 512
-output_dim = 3
+
 batch_size = 1
 
 
-def bm_predictions(test_text, test_labels, model_name="sentence-transformers/distiluse-base-multilingual-cased-v2", model_path='classifiers/classifier_base_model.pth'):
+def predictions(test_text, test_labels, input_dim = 512, output_dim = 3, model_name="sentence-transformers/distiluse-base-multilingual-cased-v2", model_path='classifiers/classifier_base_model.pth'):
     # Loading base model and its classifier:
     base_model = SentenceTransformer(model_name)
-    bm_classifier = Classifier(input_dim, output_dim).to(device)
-    bm_classifier.load_state_dict(torch.load(model_path))
-    bm_classifier.eval()
+    classifier = Classifier(input_dim, output_dim).to(device)
+    load = torch.load(model_path)
+    classifier.load_state_dict(load)
+    classifier.eval()
 
     # Computing test dataset encodings:
     test_embds = base_model.encode(test_text)
+    print(len(test_embds))
     # Preparing DataLoader:
     test_dataset = ClassifyingDataset(test_embds, test_labels)
     test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
-
+    print(len(test_dataloader))
     # Calculating predictions:
-    bm_predictions = []
+    predictions = []
     with torch.no_grad():
         for embds, labels in test_dataloader:
+
             embds, labels = embds.to(device), labels.to(device).long()
-            outputs = bm_classifier(embds)
+            outputs = classifier(embds)
             probs = torch.softmax(outputs, dim=1)
-            _, predictions = torch.max(probs, dim=1)
-            bm_predictions.extend(predictions.cpu().numpy())
-    return bm_predictions
+            _, predicts = torch.max(probs, dim=1)
+            predictions.extend(predicts.cpu().numpy())
+    return predictions
 
 
 if __name__=='__main__':
@@ -49,7 +51,7 @@ if __name__=='__main__':
     test_text, test_labels = prepare_dataset(train=False)
 
     # Computing base models classifications:
-    bm_predictions = bm_predictions(test_text, test_labels)
+    bm_predictions = predictions(test_text, test_labels)
 
     # Measuring performance:
     bm_precision = precision_score(test_labels, bm_predictions, average='weighted')
