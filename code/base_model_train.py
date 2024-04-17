@@ -63,7 +63,7 @@ if __name__=='__main__':
     train_text, train_labels, val_text, val_labels = prepare_dataset(train=True)
 
     # Loading base model:
-    base_model = SentenceTransformer("sentence-transformers/distiluse-base-multilingual-cased-v2")
+    base_model = SentenceTransformer("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
     train_embds = base_model.encode(train_text)
     val_embds = base_model.encode(val_text)
 
