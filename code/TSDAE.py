@@ -13,7 +13,7 @@ import torch.nn as nn
 
 from classifier import train_classifier
 
-import nltk
+# import nltk
 #nltk.download('punkt')
 
 from sklearn.model_selection import train_test_split
@@ -37,7 +37,7 @@ lr = params["lr"]
 epochs = params["epochs"]
 
 model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-classifier_path = "../classifiers/tsdae_model.pth"
+classifier_path = "../models/tsdae_model.pth"
 
 # Prepare training and validation data
 train_text, train_labels, val_text, val_labels = prepare_dataset(True)

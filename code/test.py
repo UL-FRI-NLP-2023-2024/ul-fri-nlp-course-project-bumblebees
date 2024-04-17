@@ -18,7 +18,7 @@ print("Using device: ", device)
 batch_size = 1
 
 
-def predictions(test_text, test_labels, input_dim = 512, output_dim = 3, model_name="sentence-transformers/distiluse-base-multilingual-cased-v2", model_path='classifiers/classifier_base_model.pth'):
+def predictions(test_text, test_labels, input_dim = 512, output_dim = 3, model_name="sentence-transformers/distiluse-base-multilingual-cased-v2", model_path='models/classifier_base_model.pth'):
     # Loading base model and its classifier:
     base_model = SentenceTransformer(model_name)
     classifier = Classifier(input_dim, output_dim).to(device)

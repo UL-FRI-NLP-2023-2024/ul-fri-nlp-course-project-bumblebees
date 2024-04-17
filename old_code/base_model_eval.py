@@ -55,7 +55,7 @@ embeddings = model.encode(test_text) # test_text is a list of sentences, embeddi
 # embeddings = torch.from_numpy(embeddings).to(device) # size: n_examples * 512
 # print(type(embeddings), embeddings.size(), embeddings.device)
 
-classifier = joblib.load('classifiers/logistic_regression_base_model.pkl')
+classifier = joblib.load('models/logistic_regression_base_model.pkl')
 test_pred = classifier.predict(embeddings)
 
 # Different scores:
