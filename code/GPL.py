@@ -7,17 +7,19 @@ from utils import prepare_dataset
 
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
+from sentence_transformers import SentenceTransformer, util
+
 # Determine device:
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Using device: ", device)
 
 # Models:
 base_model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+msmarco_model = SentenceTransformer("msmarco-distilroberta-base-v3")
 
 ######### GENERATORS #############
 #T5_name = "doc2query/msmarco-14langs-mt5-base-v1" # ta nima slovenščine! - nenavadne poizvedbe, na pol v cirilici
 T5_name = "cjvt/t5-sl-large" # ta je samo za slovenščino - TODO: zakaj nič ne generira? -> problem v kodi modela?
-
 # T5_name = "google/mt5-base" 
 # ima posebne zahteve glede tokenizerja
 tokenizer = AutoTokenizer.from_pretrained("google/mt5-base")
@@ -46,15 +48,15 @@ modelt5 = AutoModelForSeq2SeqLM.from_pretrained("google/mt5-base")
 #################################################
 
 ######### NEGATIVE MINING #########
-negative_mining_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2" # TODO: choose a model
-#negative_mining_name = "sentence-transformers/distiluse-base-multilingual-cased-v2" #mogoce ta pol? nisem zih
+# negative_mining_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+negative_mining_name = ["msmarco-distilbert-base-v3", "msmarco-MiniLM-L-6-v3"] #tale je default
+#negative_mining_name = "sentence-transformers/distiluse-base-multilingual-cased-v2"
 
 
 ######### RERANKING ###############
 #cross_encoder_name = "jeffwan/mmarco-mMiniLMv2-L12-H384-v1"
-#izbral tega za reranking, feel free dat kerga druzga ce ni ok
-cross_encoder_name = "sentence-transformers/msmarco-distilbert-base-v3"
-#def do_evaluation():
+#TALE ISTI, KOT NA PYPI GPL.TRAIN
+cross_encoder_name = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 
 def train():
     gpl.train(
@@ -66,11 +68,12 @@ def train():
         negatives_per_query=50,  #subject to change
         generator=T5_name,
         retrievers=[negative_mining_name],
+        retriever_score_functions=["cos_sim", "cos_sim"],
         cross_encoder=cross_encoder_name,   #i changed the reranking algo, feel free to change ce nebo ok
         qgen_prefix='qgen',
         evaluation_data='data',
         evaluation_output="./evaluation/gpl_model", #not sure, ce je tole pravilno za eval output path
-        do_evaluation=True
+        # do_evaluation=True 
     )
     #if(do_evaluation):
 
