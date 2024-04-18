@@ -43,7 +43,6 @@ classifier_path = "../models/tsdae_model.pth"
 train_text, train_labels, val_text, val_labels = prepare_dataset(True)
 test_text, test_labels = prepare_dataset(False)
 
-
 # DataLoader:
 
 #By default, the DenoisingAutoEncoderDataset deletes tokens with a probability of 60% per token

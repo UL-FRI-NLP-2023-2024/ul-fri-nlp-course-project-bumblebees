@@ -18,7 +18,7 @@ print("Using device: ", device)
 
 # Models:
 base_model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-msmarco_model = SentenceTransformer("msmarco-distilroberta-base-v3")
+# msmarco_model = SentenceTransformer("sentence-transformers/msmarco-distilroberta-base-v3") todo nekej je s tem težava
 
 ######### GENERATORS #############
 #T5_name = "doc2query/msmarco-14langs-mt5-base-v1" # ta nima slovenščine! - nenavadne poizvedbe, na pol v cirilici
@@ -72,7 +72,7 @@ input_dim = 384
 output_dim = 3
 
 def eval():
-    gpl_predictions = predictions(test_text, test_labels, input_dim, output_dim, 'models/gpl', classifier_path) #TODO Tale path za dokoncat
+    gpl_predictions = predictions(test_text, test_labels, input_dim, output_dim, 'models/gpl', classifier_path) #TODO Tale path sm si sam zmislu
     # print(len(test_labels))
     # print(len(tsdae_predictions))
     bm_precision = precision_score(test_labels, gpl_predictions, average='weighted')
@@ -80,25 +80,6 @@ def eval():
     bm_accuracy = accuracy_score(test_labels, gpl_predictions)
     bm_f1 = f1_score(test_labels, gpl_predictions, average='weighted')
     print(f"GPL EVAL\n  Results on test set:\n  precision: {bm_precision}\n  recall: {bm_recall}\n  accuracy: {bm_accuracy}\n  f1 score: {bm_f1}")
-
-# def train_gpl_classifier():
-#     fine_tuned_model = SentenceTransformer('models/gpl')
-
-#     train_embedds = fine_tuned_model.encode(test_text)
-#     val_embedds = fine_tuned_model.encode(val_text)
-
-#     train_dataset = ClassifyingDataset(train_embedds, train_labels)
-#     train_dataloader = DataLoader(train_dataset, batch_size=8, shuffle=True, drop_last=True)
-
-#     val_dataset = ClassifyingDataset(val_embedds, train_labels)
-#     val_dataloader = DataLoader(val_dataset, batch_size=8, shuffle=True, drop_last=True)
-
-#     model = Classifier(input_dim, output_dim).to(device)
-
-#     criterion = nn.CrossEntropyLoss()
-#     optimizer = optim.Adam(model.parameters(), lr=lr)
-
-#     train_classifier(train_dataloader, val_dataloader, model, criterion, optimizer, device, epochs, classifier_path)
 
 
 def train():
@@ -112,7 +93,7 @@ def train():
         generator=T5_name,
         retrievers=[negative_mining_name],
         retriever_score_functions=["cos_sim", "cos_sim"],
-        cross_encoder=cross_encoder_name,   #i changed the reranking algo, feel free to change ce nebo ok
+        cross_encoder=cross_encoder_name,
         qgen_prefix='qgen',
         evaluation_data='data',
         evaluation_output="./evaluation/gpl_model", #not sure, ce je tole pravilno za eval output path
