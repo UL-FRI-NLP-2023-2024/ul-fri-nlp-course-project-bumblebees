@@ -1,13 +1,16 @@
-from tqdm.auto import tqdm
 import json
 import os
 import torch
 import gpl
-from utils import prepare_dataset
 
+from tqdm.auto import tqdm
+from torch.utils.data import DataLoader
+from utils import prepare_dataset, Classifier, ClassifyingDataset
+from test import predictions
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
-
 from sentence_transformers import SentenceTransformer, util
+from sklearn.metrics import precision_score, recall_score, accuracy_score, f1_score
+from classifier import train_classifier
 
 # Determine device:
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -58,6 +61,46 @@ negative_mining_name = ["msmarco-distilbert-base-v3", "msmarco-MiniLM-L-6-v3"] #
 #TALE ISTI, KOT NA PYPI GPL.TRAIN
 cross_encoder_name = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 
+
+train_text, train_labels, val_text, val_labels = prepare_dataset(True)
+test_text, test_labels = prepare_dataset(False)
+classifier_path = "../models/gpl_model.pth" # TODO je to ok?
+
+#tele parametre je probably treba sprement za GPL?
+fine_tuned_model = ""
+input_dim = 384
+output_dim = 3
+
+def eval():
+    gpl_predictions = predictions(test_text, test_labels, input_dim, output_dim, 'models/gpl', classifier_path) #TODO Tale path za dokoncat
+    # print(len(test_labels))
+    # print(len(tsdae_predictions))
+    bm_precision = precision_score(test_labels, gpl_predictions, average='weighted')
+    bm_recall = recall_score(test_labels, gpl_predictions, average='weighted')
+    bm_accuracy = accuracy_score(test_labels, gpl_predictions)
+    bm_f1 = f1_score(test_labels, gpl_predictions, average='weighted')
+    print(f"GPL EVAL\n  Results on test set:\n  precision: {bm_precision}\n  recall: {bm_recall}\n  accuracy: {bm_accuracy}\n  f1 score: {bm_f1}")
+
+# def train_gpl_classifier():
+#     fine_tuned_model = SentenceTransformer('models/gpl')
+
+#     train_embedds = fine_tuned_model.encode(test_text)
+#     val_embedds = fine_tuned_model.encode(val_text)
+
+#     train_dataset = ClassifyingDataset(train_embedds, train_labels)
+#     train_dataloader = DataLoader(train_dataset, batch_size=8, shuffle=True, drop_last=True)
+
+#     val_dataset = ClassifyingDataset(val_embedds, train_labels)
+#     val_dataloader = DataLoader(val_dataset, batch_size=8, shuffle=True, drop_last=True)
+
+#     model = Classifier(input_dim, output_dim).to(device)
+
+#     criterion = nn.CrossEntropyLoss()
+#     optimizer = optim.Adam(model.parameters(), lr=lr)
+
+#     train_classifier(train_dataloader, val_dataloader, model, criterion, optimizer, device, epochs, classifier_path)
+
+
 def train():
     gpl.train(
         path_to_generated_data='data',
@@ -65,7 +108,7 @@ def train():
         batch_size_gpl=16,
         gpl_steps=140_000,
         output_dir='./models/gpl_model',
-        negatives_per_query=50,  #subject to change
+        negatives_per_query=50,  #koliko?
         generator=T5_name,
         retrievers=[negative_mining_name],
         retriever_score_functions=["cos_sim", "cos_sim"],
