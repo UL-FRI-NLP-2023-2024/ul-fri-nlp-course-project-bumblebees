@@ -1,33 +1,38 @@
 import numpy as np
 from datasets import load_dataset
-from torch.utils.data import Dataset
-import torch.nn as nn
+from sentence_transformers import SentenceTransformer
+import torch
+from torch.utils.data import DataLoader
+from classifier import Classifier, ClassifyingDataset
 
 
-# TODO: preveriti moramo, ali je to primerno - samo en Linear
-class Classifier(nn.Module):
-    def __init__(self, input_dim, output_dim):
-        super().__init__()
-        self.linear = nn.Linear(input_dim, output_dim)
+# Compute predictions:
+def predictions(test_text, test_labels, device, batch_size = 1, input_dim = 512, output_dim = 3, model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", clf_name='models/classifier_base_model.pth'):
+    # Loading model and its classifier:
+    base_model = SentenceTransformer(model_name)
+    classifier = Classifier(input_dim, output_dim).to(device)
+    load = torch.load(clf_name)
+    classifier.load_state_dict(load)
+    classifier.eval()
+
+    # Computing test dataset encodings:
+    test_embds = base_model.encode(test_text)
+    # Preparing DataLoader:
+    test_dataset = ClassifyingDataset(test_embds, test_labels)
+    test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
+    # Calculating predictions:
+    predictions = []
+    with torch.no_grad():
+        for embds, labels in test_dataloader:
+
+            embds, labels = embds.to(device), labels.to(device).long()
+            outputs = classifier(embds)
+            probs = torch.softmax(outputs, dim=1)
+            _, predicts = torch.max(probs, dim=1)
+            predictions.extend(predicts.cpu().numpy())
+    return predictions
+
     
-    def forward(self, x):
-        x = self.linear(x)
-        return x
-    
-
-# Custom dataset:
-class ClassifyingDataset(Dataset):
-    def __init__(self, embds, labels) -> None:
-        self.embds = embds
-        self.labels = labels
-    
-    def __len__(self):
-        return len(self.embds)
-    
-    def __getitem__(self, index):
-        return self.embds[index], self.labels[index]
-
-
 #TODO: find a faster way
 def replace_labels(item):
     labels = {'neutral': 0, 'negative': 1, 'positive': 2}
@@ -46,11 +51,11 @@ def prepare_dataset(train):
     n_train = round(0.7 * dataset_len)
     n_val = round(0.1 * dataset_len)
 
-    n_train = 1000
-    n_val = 100
-    end = 1400
-
-    # TODO: set to full length (for example replace 5000)
+    # Use less data for testing code:
+    # n_train = 1000
+    # n_val = 100
+    # end = 1400
+    
     # Train and validation set:
     if train:
         train_text, train_labels = dataset['train']['content'][0:n_train], dataset['train']['sentiment'][0:n_train]
@@ -60,6 +65,6 @@ def prepare_dataset(train):
         return train_text, np.asarray(train_labels), val_text, np.asarray(val_labels)
     
     # Test set:
-    test_text, test_labels = dataset['train']['content'][n_train+n_val:end], dataset['train']['sentiment'][n_train+n_val:end]
+    test_text, test_labels = dataset['train']['content'][n_train+n_val:], dataset['train']['sentiment'][n_train+n_val:]
     test_labels = replace_labels(test_labels)
     return test_text, test_labels

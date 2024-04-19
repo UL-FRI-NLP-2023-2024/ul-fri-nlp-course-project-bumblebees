@@ -1,14 +1,34 @@
 import torch
-import numpy as np
+from torch.utils.data import Dataset
+import torch.nn as nn
 from sklearn.metrics import f1_score
 
 
-# Determine device:
-#device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-#print("Using device: ", device)
+# Classifier - maps input_dim-dimensional sentence encodings into output_dim classes:
+class Classifier(nn.Module):
+    def __init__(self, input_dim, output_dim):
+        super().__init__()
+        self.linear = nn.Linear(input_dim, output_dim)
+    
+    def forward(self, x):
+        x = self.linear(x)
+        return x
+    
 
+# Custom dataset:
+class ClassifyingDataset(Dataset):
+    def __init__(self, embds, labels) -> None:
+        self.embds = embds
+        self.labels = labels
+    
+    def __len__(self):
+        return len(self.embds)
+    
+    def __getitem__(self, index):
+        return self.embds[index], self.labels[index]
+    
 
-def train_classifier(train_dataloader, val_dataloader, model, criterion, optimizer, device, epochs=3, save_path="../classifier/classifier_model.pth'"):
+def train_classifier(train_dataloader, val_dataloader, model, criterion, optimizer, device, epochs=3, save_path="models/classifier_model.pth"):
     for epoch in range(epochs):
         # Training:
         model.train()
