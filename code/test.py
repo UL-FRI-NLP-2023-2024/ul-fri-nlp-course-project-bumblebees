@@ -28,11 +28,9 @@ def predictions(test_text, test_labels, input_dim = 512, output_dim = 3, model_n
 
     # Computing test dataset encodings:
     test_embds = base_model.encode(test_text)
-    print(len(test_embds))
     # Preparing DataLoader:
     test_dataset = ClassifyingDataset(test_embds, test_labels)
     test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
-    print(len(test_dataloader))
     # Calculating predictions:
     predictions = []
     with torch.no_grad():

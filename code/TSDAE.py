@@ -5,25 +5,13 @@ from sentence_transformers.losses import DenoisingAutoEncoderLoss
 from sentence_transformers.datasets import DenoisingAutoEncoderDataset
 from sentence_transformers.evaluation import EmbeddingSimilarityEvaluator
 
-from utils import prepare_dataset, Classifier, ClassifyingDataset
+
+
 from base_model_train import train
 from test import predictions
-import torch.optim as optim
-import torch.nn as nn
-
+from utils import prepare_dataset, Classifier, ClassifyingDataset
 from classifier import train_classifier
 
-# import nltk
-#nltk.download('punkt')
-
-from sklearn.model_selection import train_test_split
-
-import pandas as pd
-
-import torch
-from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
-
-from sklearn.metrics import precision_score, recall_score, accuracy_score, f1_score
 
 
 # Parameters:
@@ -39,27 +27,24 @@ epochs = params["epochs"]
 model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 classifier_path = "../models/tsdae_model.pth"
 
+input_dim = 384
+output_dim = 3
+
 # Prepare training and validation data
 train_text, train_labels, val_text, val_labels = prepare_dataset(True)
 test_text, test_labels = prepare_dataset(False)
 
-# DataLoader:
-
-#By default, the DenoisingAutoEncoderDataset deletes tokens with a probability of 60% per token
-# dataset class with noise functionality built-in
-
-
 
 
 def main():
-    #train()
+    train()
     train_tsdae_classifier()
     eval()
 
 def train():
     # Prepare base model (multilingual SBERT)
 
-    model = SentenceTransformer(model_name)
+    model = SentenceTransformer(model_name).to(device)
 
     #returns label and texts (corrupted and original sentence)
     train_data = DenoisingAutoEncoderDataset(train_text)
@@ -76,14 +61,9 @@ def train():
     model.save('models/tsdaeDistilUse')
 
 
-
-fine_tuned_model = ""
-input_dim = 384
-output_dim = 3
-
 def train_tsdae_classifier():
 
-    fine_tuned_model = SentenceTransformer('models/tsdae_MiniLM')
+    fine_tuned_model = SentenceTransformer('models/tsdae_MiniLM').to(device)
 
     # encode data to get 384 len embeddings and train classifier for 3 len embeddings
     train_embedds = fine_tuned_model.encode(test_text)
@@ -106,8 +86,7 @@ def train_tsdae_classifier():
 
 def eval():
     tsdae_predictions = predictions(test_text, test_labels, input_dim, output_dim, 'models/tsdae_MiniLM', classifier_path)
-    print(len(test_labels))
-    print(len(tsdae_predictions))
+
     bm_precision = precision_score(test_labels, tsdae_predictions, average='weighted')
     bm_recall = recall_score(test_labels, tsdae_predictions, average='weighted')
     bm_accuracy = accuracy_score(test_labels, tsdae_predictions)
