@@ -8,11 +8,13 @@ from classifier import Classifier, ClassifyingDataset, train_classifier
 
 
 # Set parameters:
-input_dim = 512
+input_dim = 384
 output_dim = 3
 lr = 0.001
-epochs = 3
+epochs = 10
 batch_size = 32
+
+
 model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 clf_name = "models/classifier_base_model.pth"
 

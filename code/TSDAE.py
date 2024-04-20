@@ -49,7 +49,8 @@ def train():
 
     model.fit(
         train_objectives=[(train_dataloader, train_loss)],
-        epochs=2,
+        epochs=epochs,
+        optimizer_params={'lr': lr},
         show_progress_bar=True
     )
     model.save(save_name)
