@@ -4,6 +4,17 @@ from sentence_transformers import SentenceTransformer
 import torch
 from torch.utils.data import DataLoader
 from classifier import Classifier, ClassifyingDataset
+from sklearn.metrics import precision_score, recall_score, accuracy_score, f1_score
+
+
+# Calculate precision, recall, accuracy and F1 score:
+def calculate_measures(test_labels, model_predictions):
+    bm_precision = precision_score(test_labels, model_predictions, average='weighted')
+    bm_recall = recall_score(test_labels, model_predictions, average='weighted')
+    bm_accuracy = accuracy_score(test_labels, model_predictions)
+    bm_f1 = f1_score(test_labels, model_predictions, average='weighted')
+
+    return bm_precision, bm_recall, bm_accuracy, bm_f1
 
 
 # Compute predictions:

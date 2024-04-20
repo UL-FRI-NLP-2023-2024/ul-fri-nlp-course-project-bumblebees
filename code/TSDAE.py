@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 import torch.optim as optim
 import torch.nn as nn
 
-from utils import prepare_dataset, predictions
+from utils import prepare_dataset, predictions, calculate_measures
 from classifier import Classifier, ClassifyingDataset, train_classifier
 
 
@@ -79,10 +79,19 @@ def train_clf():
     train_classifier(train_dataloader, val_dataloader, model, criterion, optimizer, device, epochs, clf_name)
 
 
-def eval(test_text, test_labels, test_batch_size):
+def eval(test_text=None, test_labels=None, test_batch_size=1):
     print("Evaluating the TSDAE fine-tuned MODEL.")
+    if test_text == None:
+        # Loading test dataset:
+        test_text, test_labels = prepare_dataset(train=False)
+
     model_predictions = predictions(test_text, test_labels, device, test_batch_size, input_dim, output_dim, model_name=save_name, clf_name=clf_name)
-    return model_predictions
+
+    m_precision, m_recall, m_accuracy, m_f1 = calculate_measures(test_labels, model_predictions)
+
+    print(f"TSDAE fine-tuned MODEL\n  Results on test set:\n    precision: {m_precision}\n    recall: {m_recall}\n    accuracy: {m_accuracy}\n    f1 score: {m_f1}")
+
+    return m_f1
 
 
 if __name__ == "__main__":

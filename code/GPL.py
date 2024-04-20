@@ -4,7 +4,7 @@ import torch
 import gpl
 from tqdm.auto import tqdm
 
-from utils import prepare_dataset, predictions
+from utils import prepare_dataset, predictions, calculate_measures
 from classifier import Classifier, ClassifyingDataset, train_classifier
 
 
@@ -54,7 +54,7 @@ def train():
     gpl.train(
         path_to_generated_data='data',
         base_ckpt=base_model_name,
-        batch_size_gpl=16,
+        batch_size_gpl=32,
         gpl_steps=140_000,
         output_dir=save_name,
         negatives_per_query=50,
@@ -77,10 +77,19 @@ def train_clf():
     # TODO: to je treba še narest do konca (podobno kot TSDAE oz. base_model)
 
 
-def eval(test_text, test_labels, test_batch_size):
+def eval(test_text=None, test_labels=None, test_batch_size=1):
     print("Evaluating the GPL fine-tuned MODEL.")
+    if test_text == None:
+        # Loading test dataset:
+        test_text, test_labels = prepare_dataset(train=False)
+
     model_predictions = predictions(test_text, test_labels, device, test_batch_size, input_dim, output_dim, model_name=save_name, clf_name=clf_name)
-    return model_predictions
+
+    m_precision, m_recall, m_accuracy, m_f1 = calculate_measures(test_labels, model_predictions)
+
+    print(f"GPL fine-tuned MODEL\n  Results on test set:\n    precision: {m_precision}\n    recall: {m_recall}\n    accuracy: {m_accuracy}\n    f1 score: {m_f1}")
+
+    return m_f1
     
 
 if __name__=='__main__':
@@ -90,44 +99,3 @@ if __name__=='__main__':
         train_clf()
     else:
         eval()
-
-
-
-# msmarco_model = SentenceTransformer("sentence-transformers/msmarco-distilroberta-base-v3")
-######### GENERATORS #############
-# # ta nima slovenščine! - nenavadne poizvedbe, na pol v cirilici
-# T5_name = "cjvt/t5-sl-large" # ta je samo za slovenščino - TODO: zakaj nič ne generira? -> problem v kodi modela?
-# T5_name = "google/mt5-base" 
-# ima posebne zahteve glede tokenizerja
-# tokenizer = AutoTokenizer.from_pretrained("google/mt5-base")
-# modelt5 = AutoModelForSeq2SeqLM.from_pretrained("google/mt5-base")
-# sam nevem kam nej dam ta tokenizer?
-
-# razred MT5ForConditionalGeneration na https://huggingface.co/docs/transformers/model_doc/mt5
-# apparently zna več jezikou zrd language modellinga, loh bi mejbi sprobal če zna slovensk dobr
-# pa še zraven majo en MT5EncoderModel 
-#
-
-######PRIMER IZ HF DOKUMENTACIJE ZA MT5###########
-
-# from transformers import MT5Model, AutoTokenizer
-
-# model = MT5Model.from_pretrained("google/mt5-small")
-# tokenizer = AutoTokenizer.from_pretrained("google/mt5-small")
-# article = "UN Offizier sagt, dass weiter verhandelt werden muss in Syrien."
-# summary = "Weiter Verhandlung in Syrien."
-# inputs = tokenizer(article, return_tensors="pt")
-# labels = tokenizer(text_target=summary, return_tensors="pt")
-
-# outputs = model(input_ids=inputs["input_ids"], decoder_input_ids=labels["input_ids"])
-# hidden_states = outputs.last_hidden_state
-
-#################################################
-######### NEGATIVE MINING #########
-# negative_mining_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
- #tale je default
-#negative_mining_name = "sentence-transformers/distiluse-base-multilingual-cased-v2"
-
-######### RERANKING ###############
-#cross_encoder_name = "jeffwan/mmarco-mMiniLMv2-L12-H384-v1"
-#TALE ISTI, KOT NA PYPI GPL.TRAIN
