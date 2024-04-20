@@ -8,4 +8,4 @@
 #SBATCH --output=/logs/gpl_classifier_%j.out
 #SBATCH --error=/logs/gpl_classifier_%j.err
 
-srun singularity exec --nv ../containers/container-pytorch-onj python code/GPL.py
+srun singularity exec --nv ../containers/container-pytorch-onj.sif python code/GPL.py

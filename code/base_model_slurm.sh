@@ -8,4 +8,4 @@
 #SBATCH --output=/logs/base_model_classifier_%j.out
 #SBATCH --error=/logs/base_model_classifier_%j.err
 
-srun singularity exec --nv ../containers/container-pytorch-onj python code/base_model.py
+srun singularity exec --nv ../containers/container-pytorch-onj.sif python code/base_model.py

@@ -8,4 +8,4 @@
 #SBATCH --output=/logs/tsdae_classifier_%j.out
 #SBATCH --error=/logs/tsdae_classifier_%j.err
 
-srun singularity exec --nv ../containers/tsdae python code/TSDAE.py
+srun singularity exec --nv ../containers/tsdae.sif python code/TSDAE.py
