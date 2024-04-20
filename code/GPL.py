@@ -1,6 +1,10 @@
 import json
 import os
 import torch
+from torch.utils.data import DataLoader
+import torch.optim as optim
+import torch.nn as nn
+from sentence_transformers import SentenceTransformer
 import gpl
 from tqdm.auto import tqdm
 
@@ -13,9 +17,14 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Using device: ", device)
 
 # Set parameters (for classifier training):
-input_dim = 384
-output_dim = 3
-batch_size_clf = 32
+with open("code/config/classifier_params.json", "r") as f:
+    params_clf = json.load(f)
+
+batch_size_clf = params_clf["batch_size"]
+lr_clf = params_clf["lr"]
+epochs_clf = params_clf["epochs"]
+input_dim = params_clf["input_dim"]
+output_dim = params_clf["output_dim"]
 
 # Models:
 base_model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
@@ -74,7 +83,24 @@ def train_clf():
     # Loading training and validation data
     train_text, train_labels, val_text, val_labels = prepare_dataset(True)
 
-    # TODO: to je treba še narest do konca (podobno kot TSDAE oz. base_model)
+    fine_tuned_model = SentenceTransformer(save_name).to(device)
+
+    # Encode data to get 384 len embeddings and train classifier for 3 len embeddings
+    train_embedds = fine_tuned_model.encode(train_text)
+    val_embedds = fine_tuned_model.encode(val_text)
+
+    train_dataset = ClassifyingDataset(train_embedds, train_labels)
+    train_dataloader = DataLoader(train_dataset, batch_size=batch_size_clf, shuffle=True, drop_last=True)
+    val_dataset = ClassifyingDataset(val_embedds, val_labels)
+    val_dataloader = DataLoader(val_dataset, batch_size=batch_size_clf, shuffle=False)
+
+    # Initializing classifying model, loss and optimizer:
+    model = Classifier(input_dim, output_dim).to(device)
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=lr_clf)
+
+    train_classifier(train_dataloader, val_dataloader, model, criterion, optimizer, device, epochs_clf, clf_name)
+
 
 
 def eval(test_text=None, test_labels=None, test_batch_size=1):

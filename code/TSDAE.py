@@ -18,13 +18,19 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 with open("code/config/tsdae_params.json", "r") as f:
     params = json.load(f)
 
+with open("code/config/classifier_params.json", "r") as f:
+    params_clf = json.load(f)
+
 batch_size = params["batch_size"]
-# Classifier:
-batch_size_clf = 32
 lr = params["lr"]
 epochs = params["epochs"]
-input_dim = 384
-output_dim = 3
+
+# Classifier:
+batch_size_clf = params_clf["batch_size"]
+lr_clf = params_clf["lr"]
+epochs_clf = params_clf["epochs"]
+input_dim = params_clf["input_dim"]
+output_dim = params_clf["output_dim"]
 
 # Models:
 model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
@@ -75,9 +81,9 @@ def train_clf():
     # Initializing classifying model, loss and optimizer:
     model = Classifier(input_dim, output_dim).to(device)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=lr)
+    optimizer = optim.Adam(model.parameters(), lr=lr_clf)
 
-    train_classifier(train_dataloader, val_dataloader, model, criterion, optimizer, device, epochs, clf_name)
+    train_classifier(train_dataloader, val_dataloader, model, criterion, optimizer, device, epochs_clf, clf_name)
 
 
 def eval(test_text=None, test_labels=None, test_batch_size=1):

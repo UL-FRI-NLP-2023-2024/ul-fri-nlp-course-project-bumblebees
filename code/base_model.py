@@ -3,18 +3,22 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
+import json
 from utils import prepare_dataset, predictions, calculate_measures
 from classifier import Classifier, ClassifyingDataset, train_classifier
 
 
 # Set parameters:
-input_dim = 384
-output_dim = 3
-lr = 0.001
-epochs = 10
-batch_size = 32
+with open("code/config/classifier_params.json", "r") as f:
+    params_clf = json.load(f)
 
+batch_size_clf = params_clf["batch_size"]
+lr_clf = params_clf["lr"]
+epochs_clf = params_clf["epochs"]
+input_dim = params_clf["input_dim"]
+output_dim = params_clf["output_dim"]
 
+# Models:
 model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 clf_name = "models/classifier_base_model.pth"
 
@@ -35,17 +39,17 @@ def train_clf():
 
     # Preparing DataLoaders:
     train_dataset = ClassifyingDataset(train_embds, train_labels)
-    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+    train_dataloader = DataLoader(train_dataset, batch_size=batch_size_clf, shuffle=True, drop_last=True)
     val_dataset = ClassifyingDataset(val_embds, val_labels)
-    val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+    val_dataloader = DataLoader(val_dataset, batch_size=batch_size_clf, shuffle=False)
 
     # Initializing classifying model, loss and optimizer:
     model = Classifier(input_dim, output_dim).to(device)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=lr)
+    optimizer = optim.Adam(model.parameters(), lr=lr_clf)
 
     # Training loop:
-    train_classifier(train_dataloader, val_dataloader, model, criterion, optimizer, device, epochs, clf_name)
+    train_classifier(train_dataloader, val_dataloader, model, criterion, optimizer, device, epochs_clf, clf_name)
 
 
 def eval(test_text=None, test_labels=None, test_batch_size=1):
