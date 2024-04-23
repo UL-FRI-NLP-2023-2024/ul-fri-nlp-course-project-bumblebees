@@ -166,7 +166,7 @@ where $CE$ is the score predicted by the cross-encoder. This gives us a dataset 
 The MarginMSE loss \cite{marginMSE} relies on the scores, or pseudo labels, provided by the cross-encoder. It teaches the dense retrieval model to predict the margin between the score of $(Q, P^{+})$-pair and score of $(Q, P^{-})$-pair. It follows the next equation:
 \begin{equation}
 	\text{MarginMSE} = \frac{1}{N} \sum_{i=0}^{N-1} |\hat{\delta_i} - \delta_i|^{2} \text{,}
-\label{eq:delta}
+\label{eq:margin}
 \end{equation}
 where $N$ is the batch size, $\delta_i$ is defined in equation~\ref{eq:delta}, provided by the cross-encoder, and $\hat{\delta_i}$ is derived by the (student) dense retrieval model, which we are fine-tuning.
 
@@ -177,7 +177,7 @@ We used the SentiNews dataset \cite{sentiNews}, which contains 169k sentences fr
 \begin{table}[!h]
 	\footnotesize
 	\begin{center}
-		\begin{tabular}{ |c|c| } 
+		\begin{tabular}{ |l|c| } 
 		\hline
 		Sentence & Sentiment \\
 		\hline
@@ -193,9 +193,7 @@ We used the SentiNews dataset \cite{sentiNews}, which contains 169k sentences fr
 \label{tab1}
 \end{table}
 
-The dataset was split into train, validation and test set (TO DO). For each method we use to fine-tune the base model, the exact same datasets are used.
-Kakšne podatke uporabljamo, kako izgledajo, in what way did you prepare the data, delitev na množice (poudarimo, da se vse metode treniranjo z enako učno množico).
-Pokažemo morda par primerov povedi v tabeli.
+The dataset was split into train (70\%), validation (10\%) and test set (20\%). For each method we use to fine-tune the base model, the exact same datasets are used.
 
 
 \subsection*{Testing approach}
@@ -210,9 +208,29 @@ Katero metriko uporabimo za primerjavo rezultatov, kako iz sentence embedding pr
 
 \section*{Results}
 
-TO DO:
-Use the results section to present the final results of your work. Present the results in a objective and scientific fashion. Use visualisations to convey your results in a clear and efficient manner. When comparing results between various techniques use appropriate statistical methodology.
+% TO DO:
+% Use the results section to present the final results of your work. Present the results in a objective and scientific fashion. Use visualisations to convey your results in a clear and efficient manner. When comparing results between various techniques use appropriate statistical methodology.
 
+Trenutni rezultati so zbrani v tabeli~\ref{tab2}.
+
+\begin{table}[!h]
+	\footnotesize
+	\begin{center}
+		\begin{tabular}{ |l|c|c|c| } 
+		\hline
+		Measure & Base model & TSDAE & GPL \\
+		\hline
+		
+		precision & 0.6124 & 0.5682 & None\\
+		recall & 0.6014 & 0.5598 & None\\
+		F1 score & 0.5637 & 0.4968 & None\\
+		
+		\hline
+		\end{tabular}
+	\end{center}
+\caption{Rezultati naučenih modelov nad SentiNews \cite{sentiNews} (2. oddaja).}
+\label{tab2}
+\end{table}
 
 
 %------------------------------------------------
