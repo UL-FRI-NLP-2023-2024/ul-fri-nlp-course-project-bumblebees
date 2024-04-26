@@ -68,7 +68,7 @@ def train():
         output_dir=save_name,
         negatives_per_query=50,
         generator=T5_name,
-        retrievers=[negative_mining_name],
+        retrievers=negative_mining_name,
         retriever_score_functions=["cos_sim", "cos_sim"],
         cross_encoder=cross_encoder_name,
         qgen_prefix='qgen'
@@ -119,7 +119,7 @@ def eval(test_text=None, test_labels=None, test_batch_size=1):
     
 
 if __name__=='__main__':
-    training = True
+    training = False
     if training:
         train()
         train_clf()
