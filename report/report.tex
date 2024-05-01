@@ -92,7 +92,7 @@ Previous state-of-the-art methods, like SBERT, for deriving sentence embeddings 
 
 Most of these previous successful methods were trained on Semantic Textual Similarity, which does not take into account any domain knowledge. Some examples of these approaches are SBERT and Infersent. One such reason for the lack of domain knowledge is that training a model might require a lot of labeled data, which can be expensive and hard to get. This holds true especially for specific topics. One way of solving this is training the model on the general corpus before fine-tuning it to the required domain~\cite{wang-etal-2021-tsdae-using, GPL}.
 
-In this report we aim to fine-tune an unsupervised multilingual base model SBERT with two of the mentioned domain adaptation techniques, namely Transformer-based Sequential Denoising Auto-Encoder (TSDAE) and Generative Pseudo Labeling (GPL) on the SentiNews classification dataset. We classify Slovenian sentences based on their sentiment, which can be positive, neutral or negative. We compare the results given by the pretrained base model and by the base model fine-tuned with both mentioned methods as well as a combination of them.
+In this report we aim to fine-tune an unsupervised multilingual base model SBERT with two of the mentioned domain adaptation techniques, namely Transformer-based Sequential Denoising Auto-Encoder (TSDAE) and Generative Pseudo Labeling (GPL) on the SentiNews classification dataset. We classify Slovenian sentences based on their sentiment, which can be positive, neutral or negative. We compare the results given by the pretrained base model and by the base model fine-tuned with both mentioned methods.
 
 We observe any improvement when faced with domain specific data compared to SBERT, trained on the exact same input sentences. We also distinguish the impact of different parameters during the learning of each approach and try to find the optimums.
 
@@ -106,8 +106,6 @@ We observe any improvement when faced with domain specific data compared to SBER
 
 \iffalse
 Use the Methods section to describe what you did an how you did it -- in what way did you prepare the data, what algorithms did you use, how did you test various solutions ... Provide all the required details for a reproduction of your work.
-
-Tu nekoliko opišemo SBERT - predvsem glede sentence embeddingov, ki jih potrebujemo za naprej.
 \fi
 
 \subsection*{SBERT}
@@ -137,14 +135,14 @@ Before training the model, TSDAE corrupts the input sentences, for example by de
 	\label{fig:tsdae}
 \end{figure}
 
-For the purpose of classifying Slovenian sentences based on their sentiment we fine-tune the SBERT model with TSDAE. We choose bert-base-uncased (TODO: change base model accordingly) for our base model. During training we use the DenoisingAutoEncoderLoss as our loss function, which expects pairs of original and corrupted sentences as the input. We train the model where the decoder attempts the reconstruction of the corrupted sentences and compare our results with the corpus~\cite{SentenceTransformers}.
+For the purpose of classifying Slovenian sentences based on their sentiment we fine-tune the SBERT model with TSDAE. We choose \textit{paraphrase-multilingual-MiniLM-L12-v2} for our base model. During training we use the DenoisingAutoEncoderLoss as our loss function, which expects pairs of original and corrupted sentences as the input. We train the model where the decoder attempts the reconstruction of the corrupted sentences and compare our results with the corpus~\cite{SentenceTransformers}.
 
 % TSDAE has been shown by Wang, Reimers and Gurevych \cite{wang-etal-2021-tsdae-using} to outperform other unsupervised approaches and other supervised models, trained with a lot of labeled data. Many previous works were evaluated on Semantic Textual Similarity (STS) which might return good performance but it is unclear how it performs on specific domains \cite{wang-etal-2021-tsdae-using}.
 
 
 \subsection*{GPL}
 
-The Generative Pseudo Labeling (GPL) is a domain adaptation technique that utilizes unsupervised learning. It allows us to fine-tune a dense retrieval model (for example SBERT \cite{SBERT}) on a desired domain. First step of GPL is preparing (query, sentence)-pairs. This takes three phases: generating suitable queries, negative mining and using cross-encoder to assign a score to each pair \cite{GPL}. This process is visualised in Figure~\ref{fig:GPL}.
+The Generative Pseudo Labeling (GPL) is a domain adaptation technique that utilizes unsupervised learning. It allows us to fine-tune a dense retrieval model (in our case SBERT \cite{SBERT}) on a desired domain. First step of GPL is preparing (query, sentence)-pairs. This takes three phases: generating suitable queries, negative mining and using cross-encoder to assign a score to each pair \cite{GPL}. This process is visualised in Figure~\ref{fig:GPL}.
 
 \begin{figure}[ht]\centering
 	\vspace{12 pt}
@@ -171,8 +169,16 @@ The MarginMSE loss \cite{marginMSE} relies on the scores, or pseudo labels, prov
 where $N$ is the batch size, $\delta_i$ is defined in equation~\ref{eq:delta}, provided by the cross-encoder, and $\hat{\delta_i}$ is derived by the (student) dense retrieval model, which we are fine-tuning.
 
 
-\subsection*{Data}
-We used the SentiNews dataset \cite{sentiNews}, which contains 169k sentences from 10.4k documents, equiped with sentiment labels, in the Slovenian language. A few examples of dataset's elements are shown in Table~\ref{tab1}.
+%------------------------------------------------
+
+
+
+\section*{Experiments}
+For the base model {\it paraphrase-multilingual-MiniLM-L12-v2}~\cite{reimers-2019-sentence-bert} was chosen.
+% tu je treba še kaj povedati o tem modelu, morda kaj vse smo testirali (sam base model pa klasifikator, tsdae, dva načina gplja) - in da so podrobnosti od fine-tunanih metod opisane v nadaljevanju
+
+% \subsection*{Data}
+We used the SentiNews dataset \cite{sentiNews}, which contains 169k sentences from 10.4k documents, equiped with sentiment labels, in the Slovenian language. The sentiment labels can be neutral, negative or positive. A few examples of dataset's elements are shown in Table~\ref{tab1}.
 
 \begin{table}[!h]
 	\footnotesize
@@ -182,45 +188,50 @@ We used the SentiNews dataset \cite{sentiNews}, which contains 169k sentences fr
 		Sentence & Sentiment \\
 		\hline
 
-		Kaže, da se blejskim vilam vendarle obeta lepša prihodnost. & positive \\
-		O tem bo Evropska komisija odločala septembra. &neutral\\
-		V Sloveniji je ta rast znašala sedem odstotkov. &negative\\
+		Kaže, da se blejskim vilam vendarle obeta lepša prihodnost. & positive\\
+		O tem bo Evropska komisija odločala septembra. & neutral\\
+		V Sloveniji je ta rast znašala sedem odstotkov. & negative\\
 
 		\hline
 		\end{tabular}
 	\end{center}
-\caption{Examples from the SentiNews \cite{sentiNews} dataset.}
+\caption{Examples from the SentiNews dataset \cite{sentiNews}.}
 \label{tab1}
 \end{table}
 
 The dataset was split into train (70\%), validation (10\%) and test set (20\%). For each method we use to fine-tune the base model, the exact same datasets are used.
 
+The approaches were tested on the test set and evaluated using the F1 score.
+% tu dopišemo še formulo za F1 score, kako se računa, kaj pomeni
 
-\subsection*{Testing approach}
-Naslov morda še ni ustrezen in se bo prilagodil.
-Katero metriko uporabimo za primerjavo rezultatov, kako iz sentence embedding pridemo do klasifikacije povedi.
 
-\subsubsection*{Classifer}
+% \subsection*{Testing approach}
+% Naslov morda še ni ustrezen in se bo prilagodil.
+% Katero metriko uporabimo za primerjavo rezultatov, kako iz sentence embedding pridemo do klasifikacije povedi.
 
-TODO
+\subsection*{Classifer}
 
-\subsubsection*{TSDAE}
+To be able to test the base model and its fine-tuned variants on the sentiment classification problem, we prepared a simple classifier. The classifier takes a sentence encoding of length 384 and transforms it into a vector of size 3 - the number of classes in our classification problem. The transformation is done via a trainable linear layer. Softmax is used on this vector to obtain probabilities for each of the classes and as the output of the classifier model the class with the highest probability is returned.
+
+For each model that we evaluated, a new classifier was trained. All of the classifiers were trained on the same training set and used the same validation set. Data was split into batches of size 32, we used learning rate 0.001 with the Adam optimizer and trained the classifier for 10 epochs. The classifier model with the highest F1 score on the validation set was chosen.
+
+
+\subsection*{TSDAE}
 
 For TSDAE fine-tuning we first prepare our dataset split and then select our base model.
 We choose a sentence-transformers model {\it paraphrase-multilingual-MiniLM-L12-v2}~\cite{reimers-2019-sentence-bert} as our starting point of training,
-which maps sentences to 384 dimensional vectors.
+which maps sentences to 384 dimensional vectors or sentence encodings.
 
-We take the training data of our split dataset and corrupt the sentences by removing words using the {\it DenoisingAutoEncoderDataset}. This function
-is used in combination with {\it DenoisingAutoEncoderLoss} which tries to reconstruct the sentences without noise.
+We take the training data of our split dataset and corrupt the sentences by removing words using the {\it DenoisingAutoEncoderDataset}. This function is used in combination with {\it DenoisingAutoEncoderLoss} which tries to reconstruct the sentences without noise.
 
-We train the model using batch size 32, 5 epochs and learning rate of 3e-5.
+We train the model using batch size 32, 5 epochs and learning rate of 3e-5. We then train a classifier to predict sentiment from the 384 dimensional vectors. We calculate the precision, recall, accuracy and F1 score shown in Table~\ref{tab2}.
 
-We then train a classfier to predict sentiment from the 384 dimensional vectors. We calculate the precision, recall, accuracy and F1 score shown in Table~\ref{tab2}.
-
-\subsubsection*{GPL}
+\subsection*{GPL}
 
 TODO
-
+% tu še povemo, da smo testirali 2 različna T5 modela
+T5 without Slovene language: {\it msmarco-14langs-mt5-base-v1}.
+T5 specifically for Slovene language: {\it slv\_doc2query}.
 %------------------------------------------------
 
 
@@ -230,7 +241,8 @@ TODO
 % TO DO:
 % Use the results section to present the final results of your work. Present the results in a objective and scientific fashion. Use visualisations to convey your results in a clear and efficient manner. When comparing results between various techniques use appropriate statistical methodology.
 
-Trenutni rezultati so zbrani v tabeli~\ref{tab2}.
+The base model {\it paraphrase-multilingual-MiniLM-L12-v2}~\cite{reimers-2019-sentence-bert}, base model fine-tuned with the TSDAE method (denoted as TSDAE), base model fine-tuned with the GPL method and {\it msmarco-14langs-mt5-base-v1} for the T5 model (denoted as GPL) and base model fine-tuned with the GPL method and {\it slv\_doc2query} for the T5 model (denoted as $\text{GPL}_{SLO}$) were evaluated on the test set part of SentiNews dataset. The results are presented in Table~\ref{tab2}.
+
 
 \begin{table}[!h]
 	\footnotesize
