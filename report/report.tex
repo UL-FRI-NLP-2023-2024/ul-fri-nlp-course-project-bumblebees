@@ -1,11 +1,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FRI Data Science_report LaTeX Template
 % Version 1.0 (28/1/2020)
-% 
+%
 % Jure Demšar (jure.demsar@fri.uni-lj.si)
 %
 % Based on MicromouseSymp article template by:
-% Mathias Legrand (legrand.mathias@gmail.com) 
+% Mathias Legrand (legrand.mathias@gmail.com)
 % With extensive modifications by:
 % Antonio Valente (antonio.luis.valente@gmail.com)
 %
@@ -34,11 +34,11 @@
 \JournalInfo{FRI Natural language processing course 2024}
 
 % Interim or final report
-\Archive{Project report} 
-%\Archive{Final report} 
+\Archive{Project report}
+%\Archive{Final report}
 
 % Article title
-\PaperTitle{Unsupervised Domain adaptation for Sentence Classification} 
+\PaperTitle{Unsupervised Domain adaptation for Sentence Classification}
 
 % Authors (student competitors) and their info
 \Authors{Veronika Matek, Karmen Frank and Luka Mihelič}
@@ -64,13 +64,13 @@ TO BE ADDED LATER IN PROCESS.
 \begin{document}
 
 % Makes all text pages the same height
-\flushbottom 
+\flushbottom
 
 % Print the title and abstract box
-\maketitle 
+\maketitle
 
 % Removes page numbering from the first page
-\thispagestyle{empty} 
+\thispagestyle{empty}
 
 %----------------------------------------------------------------------------------------
 %	ARTICLE CONTENTS
@@ -78,7 +78,7 @@ TO BE ADDED LATER IN PROCESS.
 
 \section*{Introduction}
 
-\iffalse	
+\iffalse
 	Uvodni zapis - slabosti SBERT-a in podobnih metod, zakaj se uporablja TSDAE in GPL (v povezavi s prilagoditvijo domene). Osredotočili se bomo na "domain adaptation" za slovenski jezik, pri čemer bomo metode testirali nad problemom "sentimental analysis" (nekako povežemo besedilo na problem klasifikacija pri čustvih). Cilj projekta je bila implementacija metod TSDAE, GPL, s katerimi finetunamo SBERT (BERT+pooling), in testiranje metod ter primerjava rezultatov nad problemom klasifikacije stavkov v eno izmed "pos", "neg", "neutral". Opazovali smo tudi izbrane parametre tekom učenja posameznega pristopa.
 
 	In the Introduction section you should write about the
@@ -88,11 +88,11 @@ TO BE ADDED LATER IN PROCESS.
 	scientific work conducted by other researchers.
 \fi
 
-Previous state-of-the-art methods, like SBERT, for deriving sentence embeddings have a key problem of not working for specific topics and domains. We bypass this problem by additionally fine-tuning our non-domain-specific base model using methods like TSDAE and GPL. Both of the methods have been proven to significantly outperform previous state-of-the-art models, like Masked Language Model, on domain specific training data, working even better if combined together~\cite{wang-etal-2021-tsdae-using, GPL}. 
+Previous state-of-the-art methods, like SBERT, for deriving sentence embeddings have a key problem of not working for specific topics and domains. We bypass this problem by additionally fine-tuning our non-domain-specific base model using methods like TSDAE and GPL. Both of the methods have been proven to significantly outperform previous state-of-the-art models, like Masked Language Model, on domain specific training data, working even better if combined together~\cite{wang-etal-2021-tsdae-using, GPL}.
 
 Most of these previous successful methods were trained on Semantic Textual Similarity, which does not take into account any domain knowledge. Some examples of these approaches are SBERT and Infersent. One such reason for the lack of domain knowledge is that training a model might require a lot of labeled data, which can be expensive and hard to get. This holds true especially for specific topics. One way of solving this is training the model on the general corpus before fine-tuning it to the required domain~\cite{wang-etal-2021-tsdae-using, GPL}.
 
-In this report we aim to fine-tune an unsupervised multilingual base model SBERT with two of the mentioned domain adaptation techniques, namely Transformer-based Sequential Denoising Auto-Encoder (TSDAE) and Generative Pseudo Labeling (GPL) on the SentiNews classification dataset. We classify Slovenian sentences based on their sentiment, which can be positive, neutral or negative. We compare the results given by the pretrained base model and by the base model fine-tuned with both mentioned methods as well as a combination of them. 
+In this report we aim to fine-tune an unsupervised multilingual base model SBERT with two of the mentioned domain adaptation techniques, namely Transformer-based Sequential Denoising Auto-Encoder (TSDAE) and Generative Pseudo Labeling (GPL) on the SentiNews classification dataset. We classify Slovenian sentences based on their sentiment, which can be positive, neutral or negative. We compare the results given by the pretrained base model and by the base model fine-tuned with both mentioned methods as well as a combination of them.
 
 We observe any improvement when faced with domain specific data compared to SBERT, trained on the exact same input sentences. We also distinguish the impact of different parameters during the learning of each approach and try to find the optimums.
 
@@ -104,7 +104,7 @@ We observe any improvement when faced with domain specific data compared to SBER
 
 \section*{Methods}
 
-\iffalse	
+\iffalse
 Use the Methods section to describe what you did an how you did it -- in what way did you prepare the data, what algorithms did you use, how did you test various solutions ... Provide all the required details for a reproduction of your work.
 
 Tu nekoliko opišemo SBERT - predvsem glede sentence embeddingov, ki jih potrebujemo za naprej.
@@ -125,7 +125,7 @@ where $n$ is the sentence embeddings' dimension and $k$ number of labels.
 
 \subsection*{TSDAE}
 
-Transformer-based Sequential Denoising Auto-Encoder (TSDAE) is a state-of-the-art unsupervised method used for domain adaptation with an encoder-decoder architecture. A shortcoming of previous sentence embedding techniques like SBERT is the lack of domain knowledge. Fine-tuning a model like this with TSDAE can adapt our model to a specific domain without any labeled data, as this is hard and expensive to acquire~\cite{wang-etal-2021-tsdae-using}. 
+Transformer-based Sequential Denoising Auto-Encoder (TSDAE) is a state-of-the-art unsupervised method used for domain adaptation with an encoder-decoder architecture. A shortcoming of previous sentence embedding techniques like SBERT is the lack of domain knowledge. Fine-tuning a model like this with TSDAE can adapt our model to a specific domain without any labeled data, as this is hard and expensive to acquire~\cite{wang-etal-2021-tsdae-using}.
 
 Before training the model, TSDAE corrupts the input sentences, for example by deleting or swapping words, and encodes them to a fixed size vector. The goal of the decoder is to reconstruct the vectors of the original input by prediciting what was changed. It is important to note that the decoder has no context as it doesn't have access to other sentence embeddings and thus creates a bottleneck~\cite{wang-etal-2021-tsdae-using}. This architecture can be seen in Figure~\ref{fig:tsdae}.
 
@@ -177,15 +177,15 @@ We used the SentiNews dataset \cite{sentiNews}, which contains 169k sentences fr
 \begin{table}[!h]
 	\footnotesize
 	\begin{center}
-		\begin{tabular}{ |l|c| } 
+		\begin{tabular}{ |l|c| }
 		\hline
 		Sentence & Sentiment \\
 		\hline
-		
+
 		Kaže, da se blejskim vilam vendarle obeta lepša prihodnost. & positive \\
 		O tem bo Evropska komisija odločala septembra. &neutral\\
 		V Sloveniji je ta rast znašala sedem odstotkov. &negative\\
-		
+
 		\hline
 		\end{tabular}
 	\end{center}
@@ -200,7 +200,26 @@ The dataset was split into train (70\%), validation (10\%) and test set (20\%). 
 Naslov morda še ni ustrezen in se bo prilagodil.
 Katero metriko uporabimo za primerjavo rezultatov, kako iz sentence embedding pridemo do klasifikacije povedi.
 
+\subsubsection*{Classifer}
 
+TODO
+
+\subsubsection*{TSDAE}
+
+For TSDAE fine-tuning we first prepare our dataset split and then select our base model.
+We choose a sentence-transformers model {\it paraphrase-multilingual-MiniLM-L12-v2}~\cite{reimers-2019-sentence-bert} as our starting point of training,
+which maps sentences to 384 dimensional vectors.
+
+We take the training data of our split dataset and corrupt the sentences by removing words using the {\it DenoisingAutoEncoderDataset}. This function
+is used in combination with {\it DenoisingAutoEncoderLoss} which tries to reconstruct the sentences without noise.
+
+We train the model using batch size 32, 5 epochs and learning rate of 3e-5.
+
+We then train a classfier to predict sentiment from the 384 dimensional vectors. We calculate the precision, recall, accuracy and F1 score shown in Table~\ref{tab2}.
+
+\subsubsection*{GPL}
+
+TODO
 
 %------------------------------------------------
 
@@ -216,15 +235,15 @@ Trenutni rezultati so zbrani v tabeli~\ref{tab2}.
 \begin{table}[!h]
 	\footnotesize
 	\begin{center}
-		\begin{tabular}{ |l|c|c|c| } 
+		\begin{tabular}{ |l|c|c|c| }
 		\hline
 		Measure & Base model & TSDAE & GPL \\
 		\hline
-		
-		precision & 0.6124 & 0.5682 & None\\
-		recall & 0.6014 & 0.5598 & None\\
-		F1 score & 0.5637 & 0.4968 & None\\
-		
+
+		precision & 0.6124 & 0.5682 & 0.4651\\
+		recall & 0.6014 & 0.5598 & 0.5104\\
+		F1 score & 0.5637 & 0.4968 & 0.3857\\
+
 		\hline
 		\end{tabular}
 	\end{center}
