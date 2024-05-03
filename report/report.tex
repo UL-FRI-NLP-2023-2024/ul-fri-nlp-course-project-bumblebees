@@ -20,7 +20,7 @@
 %----------------------------------------------------------------------------------------
 \documentclass[fleqn,moreauthors,10pt]{ds_report}
 \usepackage[english]{babel}
-
+\usepackage{amsmath}
 \graphicspath{{fig/}}
 
 
@@ -114,7 +114,9 @@ SBERT (Sentence Bidirectional Encoder Representations from Transformers) adds si
 The classification objective function concatenates sentence embeddings \(u\) and \(v\) with the element-wise difference \(|u - v|\) and multiplies it with the trainable weight \( W_t \in \mathbb{R}^{3n \times k} \) \cite{SBERT}:
 
 \begin{equation}
+\begin{gathered}
 o = \text{softmax}(W_t(u, v, |u - v|)) \text{,}
+\end{gathered}
 \label{eq:softmax}
 \end{equation}
 
@@ -201,13 +203,32 @@ We used the SentiNews dataset \cite{sentiNews}, which contains 169k sentences fr
 
 The dataset was split into train (70\%), validation (10\%) and test set (20\%). For each method we use to fine-tune the base model, the exact same datasets are used.
 
-The approaches were tested on the test set and evaluated using the F1 score.
+The approaches were tested on the test set and evaluated using the F1 score shown on the following equation \ref{eq:f1}:
 % tu dopišemo še formulo za F1 score, kako se računa, kaj pomeni
 
+\begin{equation}
+	\text{F1 score} =\frac{2 \times \text{\it{precision}} \times \text{\it{recall}}}{\text{\it{precision}} + \text{\it{recall}}} \text{,}
+\label{eq:f1}
+\end{equation}
+
+F1 score is a metric that combines precision and recall from evaluating the performance of the model where they are defined as:
+
+\begin{equation}
+	\text{\it{precision}} =\frac {\text{TP}}{\text{TP} + \text{FP}} \text{,}
+\label{eq:precision}
+\end{equation}
+
+\begin{equation}
+	\text{\it{recall}} =\frac {\text{TP}}{\text{TP} + \text{FN}} \text{,}
+\label{eq:recall}
+\end{equation}
+
+Precision metric of the model tells us how many accurate positive predictions have been made based on the equation \ref{eq:precision} and recall how well the model covered all true positives from the positive sample set. as shown on equation \ref{eq:recall}. The F1 score is a relative metric that tells us how well our chosen transformer model in the GPL adaptation extracts sentiment polarity from semantics and shows overall performance for each possible sentiment class triplet.
 
 % \subsection*{Testing approach}
 % Naslov morda še ni ustrezen in se bo prilagodil.
 % Katero metriko uporabimo za primerjavo rezultatov, kako iz sentence embedding pridemo do klasifikacije povedi.
+
 
 \subsection*{Classifer}
 
@@ -227,11 +248,11 @@ We take the training data of our split dataset and corrupt the sentences by remo
 We train the model using batch size 32, 5 epochs and learning rate of 3e-5. We then train a classifier to predict sentiment from the 384 dimensional vectors. We calculate the precision, recall, accuracy and F1 score shown in Table~\ref{tab2}.
 
 \subsection*{GPL}
+For training our GPL model we first trained two models with different T5 doc2query approaches for query qeneration. For creating a model without Slovene language recognition we use the docT5query model, also known as {\it msmarco-14langs-mt5-base-v1} \cite{msmarco14langs}, and specifically for learning Slovene language we use the {\it slv\_doc2query} \cite{boshko} transformer model. 
 
-TODO
-% tu še povemo, da smo testirali 2 različna T5 modela
-T5 without Slovene language: {\it msmarco-14langs-mt5-base-v1}.
-T5 specifically for Slovene language: {\it slv\_doc2query}.
+We train the model with the parameters set as batch size to 32, 140 000 steps, 50 negatives per query and for the score evaluation method for dense vector retrieval we use computation of cosine similarity, which also works for usage of the default hybrid retriever in combination of {\it msmarco-distilbert-base-v3 } \cite{msmarcodistil} and {\it msmarco-MiniLM-L-6-v3} \cite{msmarcominilm} for negative mining. After fine-tuning with the GPL, we train the classifier that to receive 384 vector embedding from encoded data for evaluation, similar to our TSDAE.
+
+
 %------------------------------------------------
 
 
@@ -241,7 +262,7 @@ T5 specifically for Slovene language: {\it slv\_doc2query}.
 % TO DO:
 % Use the results section to present the final results of your work. Present the results in a objective and scientific fashion. Use visualisations to convey your results in a clear and efficient manner. When comparing results between various techniques use appropriate statistical methodology.
 
-The base model {\it paraphrase-multilingual-MiniLM-L12-v2}~\cite{reimers-2019-sentence-bert}, base model fine-tuned with the TSDAE method (denoted as TSDAE), base model fine-tuned with the GPL method and {\it msmarco-14langs-mt5-base-v1} for the T5 model (denoted as GPL) and base model fine-tuned with the GPL method and {\it slv\_doc2query} for the T5 model (denoted as $\text{GPL}_{SLO}$) were evaluated on the test set part of SentiNews dataset. The results are presented in Table~\ref{tab2}.
+The base model {\it paraphrase-multilingual-MiniLM-L12-v2}~\cite{reimers-2019-sentence-bert}, base model fine-tuned with the TSDAE method (denoted as TSDAE), base model fine-tuned with the GPL method and {\it msmarco-14langs-mt5-base-v1} \cite{msmarco14langs} for the T5 model (denoted as GPL) and base model fine-tuned with the GPL method and {\it slv\_doc2query} \cite{boshko} for the T5 model (denoted as $\text{GPL}_{SLO}$) were evaluated on the test set part of SentiNews dataset. The results are presented in Table~\ref{tab2}.
 
 
 \begin{table}[!h]
