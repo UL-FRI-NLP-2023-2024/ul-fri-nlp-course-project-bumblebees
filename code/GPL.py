@@ -27,11 +27,18 @@ input_dim = params_clf["input_dim"]
 output_dim = params_clf["output_dim"]
 
 # Models:
-base_model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-clf_name = "models/classifier_gpl.pth"
-save_name = "models/paraphrase_MiniLM_gpl.pth"
+#base_model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+base_model_name = "EMBEDDIA/sloberta"
 
-T5_name = "doc2query/msmarco-14langs-mt5-base-v1" # does not contain Slovene
+#clf_name = "models/classifier_gpl.pth"
+clf_name = "models/classifier_gpl_boshko_sloberta.pth"
+#clf_name = "models/classifier_gpl_boshko.pth"
+save_name ="models/paraphrase_MiniLM_gpl_boshko_sloberta.pth"
+#save_name = "models/paraphrase_MiniLM_gpl.pth"
+#save_name = "models/paraphrase_MINILM_gpl_boshko.pth"
+
+#T5_name = "doc2query/msmarco-14langs-mt5-base-v1" # does not contain Slovene
+T5_name = "bkoloski/slv_doc2query"
 negative_mining_name = ["msmarco-distilbert-base-v3", "msmarco-MiniLM-L-6-v3"] # same as default
 cross_encoder_name = "cross-encoder/ms-marco-MiniLM-L-6-v2" # same as default
 
@@ -74,7 +81,7 @@ def train():
         qgen_prefix='qgen'
         # evaluation_data='data',
         # evaluation_output="./evaluation/gpl_model", #not sure, ce je tole pravilno za eval output path
-        # do_evaluation=True 
+        # do_evaluation=True
     )
 
 
@@ -116,10 +123,11 @@ def eval(test_text=None, test_labels=None, test_batch_size=1):
     print(f"GPL fine-tuned MODEL\n  Results on test set:\n    precision: {m_precision}\n    recall: {m_recall}\n    accuracy: {m_accuracy}\n    f1 score: {m_f1}")
 
     return m_f1
-    
+
 
 if __name__=='__main__':
-    training = False
+    training = True
+    #training = False
     if training:
         train()
         train_clf()
