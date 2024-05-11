@@ -19,8 +19,11 @@ input_dim = params_clf["input_dim"]
 output_dim = params_clf["output_dim"]
 
 # Models:
-model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-clf_name = "models/classifier_base_model.pth"
+#model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+model_name = "EMBEDDIA/sloberta"
+
+#clf_name = "models/classifier_base_model.pth"
+clf_name = "models/classifier_base_model_sloberta.pth"
 
 # Determine device:
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -69,6 +72,7 @@ def eval(test_text=None, test_labels=None, test_batch_size=1):
 
 if __name__=='__main__':
     training = True
+    #training = True
     if training:
         train_clf()
     else:

@@ -23,7 +23,12 @@
 \usepackage{amsmath}
 \graphicspath{{fig/}}
 
+\usepackage{multirow}
+\usepackage{makecell}
 
+\usepackage{color, colortbl}
+\definecolor{Blue}{rgb}{0.8549,0.9098,0.9882}
+\definecolor{Red}{rgb}{0.9725,0.8078,0.8}
 
 
 %----------------------------------------------------------------------------------------
@@ -187,7 +192,7 @@ We used the SentiNews dataset \cite{sentiNews}, which contains 169k sentences fr
 	\begin{center}
 		\begin{tabular}{ |l|c| }
 		\hline
-		Sentence & Sentiment \\
+		\rowcolor{Red}Sentence & Sentiment \\
 		\hline
 
 		Kaže, da se blejskim vilam vendarle obeta lepša prihodnost. & positive\\
@@ -264,24 +269,99 @@ We train the model with the parameters set as batch size to 32, 140 000 steps, 5
 
 The base model {\it paraphrase-multilingual-MiniLM-L12-v2}~\cite{reimers-2019-sentence-bert}, base model fine-tuned with the TSDAE method (denoted as TSDAE), base model fine-tuned with the GPL method and {\it msmarco-14langs-mt5-base-v1} \cite{msmarco14langs} for the T5 model (denoted as GPL) and base model fine-tuned with the GPL method and {\it slv\_doc2query} \cite{boshko} for the T5 model (denoted as $\text{GPL}_{SLO}$) were evaluated on the test set part of SentiNews dataset. The results are presented in Table~\ref{tab2}.
 
+TO JE VSE NAD PARAPHRASE MODELOM!
 
 \begin{table}[!h]
 	\footnotesize
 	\begin{center}
-		\begin{tabular}{ |l|c|c|c| }
+		\begin{tabular}{ |l|c|c|c|c| }
 		\hline
-		Measure & Base model & TSDAE & GPL \\
+		\rowcolor{Red}Measure & Base model & TSDAE & GPL & $\text{GPL}_{SLO}$ \\
 		\hline
 
-		precision & 0.6124 & 0.5682 & 0.4651\\
-		recall & 0.6014 & 0.5598 & 0.5104\\
-		F1 score & 0.5637 & 0.4968 & 0.3857\\
+		precision & 0.6124 & 0.5682 & 0.4651 & 0.5641 \\
+		recall & 0.6014 & 0.5598 & 0.5104 & 0.5663 \\
+		F1 score & \textbf{0.5637} & 0.4968 & 0.3857 & 0.5125 \\
 
 		\hline
 		\end{tabular}
 	\end{center}
 \caption{Rezultati naučenih modelov nad SentiNews \cite{sentiNews} (2. oddaja).}
 \label{tab2}
+\end{table}
+
+
+\subsection*{TSDAE}
+We trained and tested base model fine-tuned with the TSDAE method for different amount of epochs.
+Omenimo, da je zgoraj uporabljeni TSDAE tisti z x epohami (in damo isto ime v obeh tabelah).
+
+\begin{table}[!h]
+	\footnotesize
+	\begin{center}
+		\begin{tabular}{ |l|c|c|c| }
+		\hline
+		\rowcolor{Red}Measure & $epochs=5$ & $epochs=10$ & $epochs=15$ \\
+		\hline
+
+		precision & 0.5682 & v & v\\
+		recall & 0.5598 & v & v\\
+		F1 score & 0.4968 & v & v\\
+
+		\hline
+		\end{tabular}
+	\end{center}
+\caption{Različno št. epoh pri TSDAE.}
+\label{tab3}
+\end{table}
+
+
+\subsection*{Combining the methods}
+Kombinacija TSDAE in GPL
+
+\begin{table}[!h]
+	\footnotesize
+	\begin{center}
+		\begin{tabular}{ |l|c|c| }
+		\hline
+		\rowcolor{Red}Measure & \thead{TSDAE+\\GPL} & \thead{GPL+\\TSDAE} \\
+		\hline
+
+		precision & v & v\\
+		recall & v & v\\
+		F1 score & v & v\\
+
+		\hline
+		\end{tabular}
+	\end{center}
+\caption{Kombinacija.}
+\label{tab4}
+\end{table}
+
+
+\subsection*{SloBERTa}
+Spremenjen base model, treniramo še ta boljši TSDAE in GPL od prej.
+Primerjamo tudi vrednosti iz te tabele in iz tabele 2.
+
+GPL SLO T5 je uporabljen!
+TSADE x epoh
+
+\begin{table}[!h]
+	\footnotesize
+	\begin{center}
+		\begin{tabular}{ |l|c|c|c| }
+		\hline
+		\rowcolor{Red}Measure & Base model & TSDAE & GPL \\
+		\hline
+
+		precision & v & v & 0.5914\\
+		recall & v & v & 0.5854\\
+		F1 score & v & v & 0.545\\
+
+		\hline
+		\end{tabular}
+	\end{center}
+\caption{Drug base model.}
+\label{tab5}
 \end{table}
 
 
