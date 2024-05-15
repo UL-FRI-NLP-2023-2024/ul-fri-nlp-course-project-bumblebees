@@ -105,7 +105,7 @@ def eval(test_text=None, test_labels=None, test_batch_size=1):
     m_precision, m_recall, m_accuracy, m_f1 = calculate_measures(
         test_labels, model_predictions)
 
-    print(f"TSDAE fine-tuned MODEL\n  Results on test set:\n    precision: { m_precision}\n    recall: {m_recall}\n    accuracy: {m_accuracy}\n    f1 score: {m_f1}")
+    print(f"TSDAE fine-tuned MODEL\n  Results on test set:\n    precision: {m_precision}\n    recall: {m_recall}\n    accuracy: {m_accuracy}\n    f1 score: {m_f1}")
 
     return m_f1
 
