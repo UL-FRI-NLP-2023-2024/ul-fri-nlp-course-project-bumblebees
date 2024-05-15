@@ -1,5 +1,6 @@
 
 import json
+import nltk
 from sentence_transformers import SentenceTransformer, losses
 from sentence_transformers.datasets import DenoisingAutoEncoderDataset
 import torch
@@ -9,6 +10,8 @@ import torch.nn as nn
 
 from utils import prepare_dataset, predictions, calculate_measures
 from classifier import Classifier, ClassifyingDataset, train_classifier
+
+nltk.download('punkt')
 
 
 # Determine device:
@@ -38,7 +41,6 @@ clf_name = "models/classifier_tsdae.pth"
 save_name = "models/paraphrase_MiniLM_tsdae.pth"
 
 
-
 def train():
     print("Starting the TSDAE fine-tuning of the model.")
     # Loading training and validation data
@@ -50,8 +52,10 @@ def train():
     # Returns labels and text (corrupted and original sentence)
     train_data = DenoisingAutoEncoderDataset(train_text)
 
-    train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True, drop_last=True)
-    train_loss = losses.DenoisingAutoEncoderLoss(model, decoder_name_or_path=model_name, tie_encoder_decoder=False)
+    train_dataloader = DataLoader(
+        train_data, batch_size=batch_size, shuffle=True, drop_last=True)
+    train_loss = losses.DenoisingAutoEncoderLoss(
+        model, decoder_name_or_path=model_name, tie_encoder_decoder=False)
 
     model.fit(
         train_objectives=[(train_dataloader, train_loss)],
@@ -74,16 +78,19 @@ def train_clf():
     val_embedds = fine_tuned_model.encode(val_text)
 
     train_dataset = ClassifyingDataset(train_embedds, train_labels)
-    train_dataloader = DataLoader(train_dataset, batch_size=batch_size_clf, shuffle=True, drop_last=True)
+    train_dataloader = DataLoader(
+        train_dataset, batch_size=batch_size_clf, shuffle=True, drop_last=True)
     val_dataset = ClassifyingDataset(val_embedds, val_labels)
-    val_dataloader = DataLoader(val_dataset, batch_size=batch_size_clf, shuffle=False)
+    val_dataloader = DataLoader(
+        val_dataset, batch_size=batch_size_clf, shuffle=False)
 
     # Initializing classifying model, loss and optimizer:
     model = Classifier(input_dim, output_dim).to(device)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=lr_clf)
 
-    train_classifier(train_dataloader, val_dataloader, model, criterion, optimizer, device, epochs_clf, clf_name)
+    train_classifier(train_dataloader, val_dataloader, model,
+                     criterion, optimizer, device, epochs_clf, clf_name)
 
 
 def eval(test_text=None, test_labels=None, test_batch_size=1):
@@ -92,11 +99,14 @@ def eval(test_text=None, test_labels=None, test_batch_size=1):
         # Loading test dataset:
         test_text, test_labels = prepare_dataset(train=False)
 
-    model_predictions = predictions(test_text, test_labels, device, test_batch_size, input_dim, output_dim, model_name=save_name, clf_name=clf_name)
+    model_predictions = predictions(test_text, test_labels, device, test_batch_size,
+                                    input_dim, output_dim, model_name=save_name, clf_name=clf_name)
 
-    m_precision, m_recall, m_accuracy, m_f1 = calculate_measures(test_labels, model_predictions)
+    m_precision, m_recall, m_accuracy, m_f1 = calculate_measures(
+        test_labels, model_predictions)
 
-    print(f"TSDAE fine-tuned MODEL\n  Results on test set:\n    precision: {m_precision}\n    recall: {m_recall}\n    accuracy: {m_accuracy}\n    f1 score: {m_f1}")
+    print(f"TSDAE fine-tuned MODEL\n  Results on test set:\n    precision: {
+          m_precision}\n    recall: {m_recall}\n    accuracy: {m_accuracy}\n    f1 score: {m_f1}")
 
     return m_f1
 
