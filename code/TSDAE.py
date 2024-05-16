@@ -35,12 +35,18 @@ epochs_clf = params_clf["epochs"]
 input_dim = params_clf["input_dim"]
 output_dim = params_clf["output_dim"]
 
+
+# clf_name = "models/classifier_gpl_boshko_sloberta.pth"
+#clf_name = "models/classifier_gpl_boshko.pth"
+# save_name ="models/paraphrase_MiniLM_gpl_boshko_sloberta.pth"
+
 # Models:
-model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+# model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+model_name = "EMBEDDIA/sloberta"
 # clf_name = "models/classifier_tsdae.pth"
 # save_name = "models/paraphrase_MiniLM_tsdae.pth"
-clf_name = "models/classifier_tsdae_2.pth"
-save_name = "models/paraphrase_MiniLM_tsdae_2.pth"
+clf_name = "models/classifier_tsdae_sloberta.pth"
+save_name = "models/paraphrase_MiniLM_tsdae_sloberta.pth"
 
 
 # def train():
@@ -106,7 +112,7 @@ def eval(test_text=None, test_labels=None, test_batch_size=1):
 
 
 if __name__ == "__main__":
-    training = False
+    training = True
     if training:
         # train()
         train_clf()

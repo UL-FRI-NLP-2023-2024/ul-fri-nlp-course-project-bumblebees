@@ -2,6 +2,6 @@
     "batch_size": 32,
     "lr": 0.001,
     "epochs": 15,
-    "input_dim": 384,
+    "input_dim": 768,
     "output_dim": 3
 }
