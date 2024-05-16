@@ -115,6 +115,6 @@ if __name__ == "__main__":
     training = True
     if training:
         train()
-        train_clf()
+        #train_clf()
     else:
         eval()
