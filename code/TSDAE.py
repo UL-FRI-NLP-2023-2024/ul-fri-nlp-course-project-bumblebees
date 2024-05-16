@@ -43,27 +43,27 @@ clf_name = "models/classifier_tsdae_2.pth"
 save_name = "models/paraphrase_MiniLM_tsdae_2.pth"
 
 
-def train():
-    print("Starting the TSDAE fine-tuning of the model.")
-    # Loading training and validation data
-    train_text, _, _, _ = prepare_dataset(train=True)
+# def train():
+#     print("Starting the TSDAE fine-tuning of the model.")
+#     # Loading training and validation data
+#     train_text, _, _, _ = prepare_dataset(train=True)
 
-    # Prepare base model (multilingual SBERT)
-    model = SentenceTransformer(model_name).to(device)
+#     # Prepare base model (multilingual SBERT)
+#     model = SentenceTransformer(model_name).to(device)
 
-    # Returns labels and text (corrupted and original sentence)
-    train_data = DenoisingAutoEncoderDataset(train_text)
+#     # Returns labels and text (corrupted and original sentence)
+#     train_data = DenoisingAutoEncoderDataset(train_text)
 
-    train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True, drop_last=True)
-    train_loss = losses.DenoisingAutoEncoderLoss(model, decoder_name_or_path=model_name, tie_encoder_decoder=False)
+#     train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True, drop_last=True)
+#     train_loss = losses.DenoisingAutoEncoderLoss(model, decoder_name_or_path=model_name, tie_encoder_decoder=False)
 
-    model.fit(
-        train_objectives=[(train_dataloader, train_loss)],
-        epochs=epochs,
-        optimizer_params={'lr': lr},
-        show_progress_bar=True
-    )
-    model.save(save_name)
+#     model.fit(
+#         train_objectives=[(train_dataloader, train_loss)],
+#         epochs=epochs,
+#         optimizer_params={'lr': lr},
+#         show_progress_bar=True
+#     )
+#     model.save(save_name)
 
 
 def train_clf():
