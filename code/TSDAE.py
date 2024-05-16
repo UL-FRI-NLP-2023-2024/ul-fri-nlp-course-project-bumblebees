@@ -39,8 +39,8 @@ output_dim = params_clf["output_dim"]
 model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 # clf_name = "models/classifier_tsdae.pth"
 # save_name = "models/paraphrase_MiniLM_tsdae.pth"
-clf_name = "models/classifier_tsdae_3.pth"
-save_name = "models/paraphrase_MiniLM_tsdae_3.pth"
+clf_name = "models/classifier_tsdae_4.pth"
+save_name = "models/paraphrase_MiniLM_tsdae_4.pth"
 
 
 # def train():
@@ -106,7 +106,7 @@ def eval(test_text=None, test_labels=None, test_batch_size=1):
 
 
 if __name__ == "__main__":
-    training = True
+    training = False
     if training:
         # train()
         train_clf()
