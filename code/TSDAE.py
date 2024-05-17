@@ -115,7 +115,7 @@ def eval(test_text=None, test_labels=None, test_batch_size=1):
 
 
 if __name__ == "__main__":
-    training = True
+    training = False
     if training:
         train()
         train_clf()
