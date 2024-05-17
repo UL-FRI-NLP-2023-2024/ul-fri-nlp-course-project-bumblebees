@@ -41,12 +41,12 @@ output_dim = params_clf["output_dim"]
 # save_name ="models/paraphrase_MiniLM_gpl_boshko_sloberta.pth"
 
 # Models:
-model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-# model_name = "EMBEDDIA/sloberta"
+# model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+model_name = "EMBEDDIA/sloberta"
 # clf_name = "models/classifier_tsdae.pth"
 # save_name = "models/paraphrase_MiniLM_tsdae.pth"
-clf_name = "models/classifier_tsdae_justtest.pth"
-save_name = "models/paraphrase_MiniLM_justtest.pth"
+clf_name = "models/classifier_tsdae_sloberta.pth"
+save_name = "models/paraphrase_MiniLM_tsdae_sloberta.pth"
 
 
 def train():
