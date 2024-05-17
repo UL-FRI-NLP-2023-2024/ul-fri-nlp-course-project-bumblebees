@@ -17,6 +17,10 @@ nltk.download('punkt')
 # Determine device:
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+# Clear cuda cache to avoid running out of memory
+if device == "cuda":
+    torch.cuda.empty_cache()
+
 # Set parameters:
 with open("code/config/tsdae_params.json", "r") as f:
     params = json.load(f)
@@ -34,7 +38,6 @@ lr_clf = params_clf["lr"]
 epochs_clf = params_clf["epochs"]
 input_dim = params_clf["input_dim"]
 output_dim = params_clf["output_dim"]
-
 
 # clf_name = "models/classifier_gpl_boshko_sloberta.pth"
 #clf_name = "models/classifier_gpl_boshko.pth"
