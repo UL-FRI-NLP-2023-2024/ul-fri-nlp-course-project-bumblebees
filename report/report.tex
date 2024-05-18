@@ -25,6 +25,7 @@
 
 \usepackage{multirow}
 \usepackage{makecell}
+\usepackage{hhline}
 
 \usepackage{color, colortbl}
 \definecolor{Blue}{rgb}{0.8549,0.9098,0.9882}
@@ -259,78 +260,101 @@ We train the model for 140 000 steps, with the batch size set to 32, generating 
 % TO DO:
 % Use the results section to present the final results of your work. Present the results in a objective and scientific fashion. Use visualisations to convey your results in a clear and efficient manner. When comparing results between various techniques use appropriate statistical methodology.
 
-The base model {\it paraphrase-multilingual-MiniLM-L12-v2}~\cite{reimers-2019-sentence-bert}, base model fine-tuned with the TSDAE method (denoted as TSDAE), base model fine-tuned with the GPL method and {\it msmarco-14langs-mt5-base-v1} \cite{msmarco14langs} for the T5 model (denoted as GPL) and base model fine-tuned with the GPL method and {\it slv\_doc2query} \cite{boshko} for the T5 model (denoted as $\text{GPL}_{SLO}$) were evaluated on the test set part of SentiNews dataset. The results are presented in Table~\ref{tab2}.
+\subsection*{\large{1. Paraphrase-multilingual-MiniLM}}
 
-TO JE VSE NAD PARAPHRASE MODELOM!
+The fine-tuning and evaluation was first executed on the {\it paraphrase-multilingual-MiniLM-L12-v2}~\cite{reimers-2019-sentence-bert} model. The compared models in this section were:
+\begin{itemize}
+	\item base model {\it paraphrase-multilingual-MiniLM-L12-v2},
+	\item base model fine-tuned with the TSDAE method, trained for 5 epochs - denoted as $\text{TSDAE}^{5}$,
+	\item base model fine-tuned with the TSDAE method, trained for 10 epochs - denoted as TSDAE,
+	\item base model fine-tuned with the TSDAE method, trained for 15 epochs - denoted as $\text{TSDAE}^{15}$,
+	\item base model fine-tuned with the GPL method and {\it msmarco-14langs-mt5-base-v1} \cite{msmarco14langs} for the T5 model - denoted as GPL and
+	\item base model fine-tuned with the GPL method and {\it slv\_doc2query}~\cite{boshko} for the T5 model - denoted as $\text{GPL}_{SLO}$.
+\end{itemize}
 
-\begin{table}[!h]
-	\footnotesize
-	\begin{center}
-		\begin{tabular}{ |l|c|c|c|c| }
-		\hline
-		\rowcolor{Red}Measure & Base model & TSDAE & GPL & $\text{GPL}_{SLO}$ \\
-		\hline
-
-		precision & 0.6124 & 0.5682 & 0.4651 & 0.5641 \\
-		recall & 0.6014 & 0.5598 & 0.5104 & 0.5663 \\
-		F1 score & \textbf{0.5637} & 0.4968 & 0.3857 & 0.5125 \\
-
-		\hline
-		\end{tabular}
-	\end{center}
-\caption{Rezultati naučenih modelov nad SentiNews \cite{sentiNews} (2. oddaja).}
-\label{tab2}
-\end{table}
-
-
-\subsection*{TSDAE}
-We trained and tested base model fine-tuned with the TSDAE method for different amount of epochs.
-Omenimo, da je zgoraj uporabljeni TSDAE tisti z x epohami (in damo isto ime v obeh tabelah).
+A new classifier was trained with the same parameters for each of the stated models. They were evaluated on the test set part of the SentiNews dataset. The results are presented in Table~\ref{tab2}.
 
 \begin{table}[!h]
 	\footnotesize
 	\begin{center}
 		\begin{tabular}{ |l|c|c|c| }
 		\hline
-		\rowcolor{Red}Measure & $epochs=5$ & $epochs=10$ & $epochs=15$ \\
+		\rowcolor{Blue}Model & Precision & Recall & F1 score\\
+		%\hhline{|=|=|=|=|}
 		\hline
 
-		precision & 0.5682 & v & v\\
-		recall & 0.5598 & v & v\\
-		F1 score & 0.4968 & v & v\\
+		Base model & 0.v & 0.v & 0.v\\
+		\hline
+		$\text{TSDAE}^{5}$ & 0.v & 0.v & 0.v\\
+		TSDAE & 0.v & 0.v & 0.v\\
+		$\text{TSDAE}^{15}$ & 0.v & 0.v & 0.v\\
+		\hline
+		GPL & 0.v & 0.v & 0.v\\
+		$\text{GPL}_{SLO}$ & 0.v & 0.v & 0.v\\
 
 		\hline
 		\end{tabular}
 	\end{center}
-\caption{Različno št. epoh pri TSDAE.}
-\label{tab3}
+\caption{Results of the base model and its fine-tuned variants on the SentiNews dataset~\cite{sentiNews}.}
+\label{tab2}
 \end{table}
+
+% REZULTATE MORAMO ŠE POKOMENTIRATI
 
 
 \subsection*{Combining the methods}
-Kombinacija TSDAE in GPL
+Considering results obtained in \cite{GPL}, we decided to test two combinations of the unsupervised adaptation techniques. The approaches were:
+\begin{itemize}
+	\item additionally fine-tune the TSDAE model with the GPL method with {\it slv\_doc2query} for the T5 model,
+	\item additionally fine-tune the $\text{GPL}_{SLO}$ model with TSDAE method for 10 epochs.
+\end{itemize}
+Results, compared to the base model, are presented in Table~\ref{tab3}.
 
 \begin{table}[!h]
 	\footnotesize
 	\begin{center}
-		\begin{tabular}{ |l|c|c| }
+		\begin{tabular}{ |l|c|c|c| }
 		\hline
-		\rowcolor{Red}Measure & \thead{TSDAE+\\GPL} & \thead{GPL+\\TSDAE} \\
+		\rowcolor{Blue}Model & Precision & Recall & F1 score\\
 		\hline
 
-		precision & v & v\\
-		recall & v & v\\
-		F1 score & v & v\\
+		Base model & 0.v & 0.v & 0.v\\
+		TSDAE+$\text{GPL}_{SLO}$ & 0.v & 0.v & 0.v\\
+		$\text{GPL}_{SLO}$+TSDAE & 0.v & 0.v & 0.v\\
 
 		\hline
 		\end{tabular}
 	\end{center}
-\caption{Kombinacija.}
-\label{tab4}
+\caption{Results of combining the fine-tuning methods TSDAE and GPL in different orders on the SentiNews dataset~\cite{sentiNews}.}
+\label{tab3}
 \end{table}
 
+% REZULTATE MORAMO ŠE POKOMENTIRATI
 
-\subsection*{SloBERTa}
+
+\subsection*{Intermediate models in GPL}
+Since we used the \textit{gpl} library for fine-tuning a chosen model with the GPL method, it allowed us to save intermediate models during this process. The GPL method fine-tunes the model for 140 000 steps by default and saves a model every 10 000 steps. Thus we obtained 13 intermediate and 1 final model. We trained a classifier for each of the models and evaluated them on the test set part of the SentiNews dataset~\cite{sentiNews}. The results were plotted and are shown in Figure~\ref{fig:gpl-versions} for GPL and in Figure~\ref{fig:gpl-slo-versions} for $\text{GPL}_{SLO}$.
+
+\begin{figure}[ht]\centering
+	\vspace{12 pt}
+	\includegraphics[width=\linewidth]{GPL_14langs_paraphrase.png}
+	\vspace{5 pt}
+	\caption{Visualisation of the F1 score evaluated on models, obtained during fine-tuning with the GPL method with {\it msmarco-14langs-mt5-base-v1} \cite{msmarco14langs} for the T5 model.}
+	\label{fig:gpl-versions}
+\end{figure}
+
+\begin{figure}[ht]\centering
+	\vspace{12 pt}
+	\includegraphics[width=\linewidth]{GPL_Boshko_paraphrase.png}
+	\vspace{5 pt}
+	\caption{Visualisation of the F1 score evaluated on models, obtained during fine-tuning with the GPL method with {\it slv\_doc2query}~\cite{boshko} for the T5 model.}
+	\label{fig:gpl-slo-versions}
+\end{figure}
+
+% REZULTATE MORAMO ŠE POKOMENTIRATI
+
+
+\subsection*{\large{2. SloBERTa}}
 Spremenjen base model, treniramo še ta boljši TSDAE in GPL od prej.
 Primerjamo tudi vrednosti iz te tabele in iz tabele 2.
 
@@ -342,19 +366,40 @@ TSADE x epoh
 	\begin{center}
 		\begin{tabular}{ |l|c|c|c| }
 		\hline
-		\rowcolor{Red}Measure & Base model & TSDAE & GPL \\
+		\rowcolor{Blue}Model & Precision & Recall & F1 score\\
 		\hline
 
-		precision & v & v & 0.5914\\
-		recall & v & v & 0.5854\\
-		F1 score & v & v & 0.545\\
+		Base model & 0.v & 0.v & 0.v\\
+		%\hline
+		TSDAE & 0.v & 0.v & 0.v\\
+		%\hline
+		%GPL & 0.v & 0.v & 0.v\\
+		$\text{GPL}_{SLO}$ & 0.v & 0.v & 0.v\\
 
 		\hline
 		\end{tabular}
 	\end{center}
-\caption{Drug base model.}
-\label{tab5}
+\caption{Results of the base model and its fine-tuned variants on the SentiNews dataset~\cite{sentiNews}.}
+\label{tab4}
 \end{table}
+
+% REZULTATE MORAMO ŠE POKOMENTIRATI
+
+
+\subsection*{Intermediate models in GPL}
+Intermediate:
+
+\begin{figure}[ht]\centering
+	\vspace{12 pt}
+	\includegraphics[width=\linewidth]{GPL_Boshko_SloBERTa.png}
+	\vspace{5 pt}
+	\caption{Visualisation of the F1 score evaluated on models, obtained during fine-tuning with the GPL method with {\it slv\_doc2query}~\cite{boshko} for the T5 model.}
+	\label{fig:gpl-slo-sloberta-versions}
+\end{figure}
+
+
+% REZULTATE MORAMO ŠE POKOMENTIRATI
+
 
 
 %------------------------------------------------
