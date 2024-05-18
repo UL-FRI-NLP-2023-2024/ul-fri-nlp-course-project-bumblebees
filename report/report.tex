@@ -49,7 +49,7 @@
 \Authors{Veronika Matek, Karmen Frank and Luka Mihelič}
 
 % Advisors
-\affiliation{\textit{Advisors: Slavko Žitnik, Aleš Žagar, Boshko Koloski}}
+\affiliation{\textit{Advisors: Boshko Koloski, Aleš Žagar, Slavko Žitnik}}
 
 % Keywords
 \Keywords{Domain Adaptation, TSDAE, GPL, SBERT, Sentence Classification}
@@ -61,7 +61,7 @@
 %----------------------------------------------------------------------------------------
 
 \Abstract{
-TO BE ADDED LATER IN PROCESS.
+Methods like SBERT are used for deriving sentence embeddings, but often do not perform well on more specific domains. This problem might be avoided if the chosen base model is fine-tuned using unsupervised fine-tuning methods like TSDAE and GPL.
 }
 
 %----------------------------------------------------------------------------------------
@@ -97,7 +97,7 @@ Previous state-of-the-art methods, like SBERT, for deriving sentence embeddings 
 
 Most of these previous successful methods were trained on Semantic Textual Similarity, which does not take into account any domain knowledge. Some examples of these approaches are SBERT and Infersent. One such reason for the lack of domain knowledge is that training a model might require a lot of labeled data, which can be expensive and hard to get. This holds true especially for specific topics. One way of solving this is training the model on the general corpus before fine-tuning it to the required domain~\cite{wang-etal-2021-tsdae-using, GPL}.
 
-In this report we aim to fine-tune an unsupervised multilingual base model SBERT with two of the mentioned domain adaptation techniques, namely Transformer-based Sequential Denoising Auto-Encoder (TSDAE) and Generative Pseudo Labeling (GPL) on the SentiNews classification dataset. We classify Slovenian sentences based on their sentiment, which can be positive, neutral or negative. We compare the results given by the pretrained base model and by the base model fine-tuned with both mentioned methods.
+In this report we aim to fine-tune an unsupervised multilingual base model with SBERT architecture with two of the mentioned domain adaptation techniques, namely Transformer-based Sequential Denoising Auto-Encoder (TSDAE) and Generative Pseudo Labeling (GPL) on the SentiNews classification dataset. We classify Slovenian sentences based on their sentiment, which can be positive, neutral or negative. We compare the results given by the pretrained base model and by the base model fine-tuned with both mentioned methods and combinations of the two.
 
 We observe any improvement when faced with domain specific data compared to SBERT, trained on the exact same input sentences. We also distinguish the impact of different parameters during the learning of each approach and try to find the optimums.
 
@@ -114,7 +114,9 @@ Use the Methods section to describe what you did an how you did it -- in what wa
 \fi
 
 \subsection*{SBERT}
-SBERT (Sentence Bidirectional Encoder Representations from Transformers) adds siamese and triplet structure networks to the pre-trained transformer network BERT, which produces state-of-the-art results for natural language processing tasks such as question answering, sentence classification and sentence-pair regression. SBERT applies a pooling layer to the output of a BERT/RoBERTa model, deriving fixed sized sentence embeddings. With the added network structures we can fine-tune the model and update weights so the to output results are sentence embeddings that are semantically meaningful \cite{SBERT}. Semantic aspects embedded in the continuous vector space can be measured with the cosine metric similarity, where similar semantic representations in a high-dimensional vector space are closer to each other. The available training data for a given knowledge domain also defines the SBERT network structure. Therefore we may use the classification, regression or the triplet objective function for different kind of tasks.
+SBERT (Sentence Bidirectional Encoder Representations from Transformers) adds siamese and triplet structure networks to the pre-trained transformer network BERT, which produces state-of-the-art results for natural language processing tasks such as sentence classification, question answering and sentence-pair regression. SBERT applies a pooling layer to the output of a BERT/RoBERTa model, deriving fixed sized sentence embeddings. With the added network structures we can fine-tune the model and update weights so the output results are sentence embeddings that are semantically meaningful~\cite{SBERT}.
+
+Semantic aspects embedded in the continuous vector space can be measured with the cosine metric similarity, where similar semantic representations in a high-dimensional vector space are closer to each other. The available training data for a given knowledge domain also defines the SBERT network structure. Therefore we may use the classification, regression or the triplet objective function for different kind of tasks.
 
 The classification objective function concatenates sentence embeddings \(u\) and \(v\) with the element-wise difference \(|u - v|\) and multiplies it with the trainable weight \( W_t \in \mathbb{R}^{3n \times k} \) \cite{SBERT}:
 
@@ -181,10 +183,8 @@ where $N$ is the batch size, $\delta_i$ is defined in equation~\ref{eq:delta}, p
 
 
 \section*{Experiments}
-For the base model {\it paraphrase-multilingual-MiniLM-L12-v2}~\cite{reimers-2019-sentence-bert} was chosen.
-% tu je treba še kaj povedati o tem modelu, morda kaj vse smo testirali (sam base model pa klasifikator, tsdae, dva načina gplja) - in da so podrobnosti od fine-tunanih metod opisane v nadaljevanju
+The experiments were conducted on two different sentence-transformer (SBERT architecture) base models, the first one being multilingual {\it paraphrase-multilingual-MiniLM-L12-v2}~\cite{reimers-2019-sentence-bert} and the second Slovenian {\it SloBERTa}~\cite{sloberta}. Both models were individually fine-tuned with the TSDAE and GPL method and combinations TSDAE+GPL and GPL+TSDAE.
 
-% \subsection*{Data}
 We used the SentiNews dataset \cite{sentiNews}, which contains 169k sentences from 10.4k documents, equiped with sentiment labels, in the Slovenian language. The sentiment labels can be neutral, negative or positive. A few examples of dataset's elements are shown in Table~\ref{tab1}.
 
 \begin{table}[!h]
@@ -192,7 +192,7 @@ We used the SentiNews dataset \cite{sentiNews}, which contains 169k sentences fr
 	\begin{center}
 		\begin{tabular}{ |l|c| }
 		\hline
-		\rowcolor{Red}Sentence & Sentiment \\
+		\rowcolor{Blue}Sentence & Sentiment \\
 		\hline
 
 		Kaže, da se blejskim vilam vendarle obeta lepša prihodnost. & positive\\
@@ -208,36 +208,28 @@ We used the SentiNews dataset \cite{sentiNews}, which contains 169k sentences fr
 
 The dataset was split into train (70\%), validation (10\%) and test set (20\%). For each method we use to fine-tune the base model, the exact same datasets are used.
 
-The approaches were tested on the test set and evaluated using the F1 score shown on the following equation \ref{eq:f1}:
-% tu dopišemo še formulo za F1 score, kako se računa, kaj pomeni
-
+The approaches were tested on the test set and evaluated using the F1 score that combines precision and recall. It is defined by the following equation:
 \begin{equation}
 	\text{F1 score} =\frac{2 \times \text{\it{precision}} \times \text{\it{recall}}}{\text{\it{precision}} + \text{\it{recall}}} \text{,}
 \label{eq:f1}
 \end{equation}
-
-F1 score is a metric that combines precision and recall from evaluating the performance of the model where they are defined as:
-
+where precision and recall are defined as:
 \begin{equation}
-	\text{\it{precision}} =\frac {\text{TP}}{\text{TP} + \text{FP}} \text{,}
+	\text{precision} =\frac {\text{TP}}{\text{TP} + \text{FP}} \text{,}
 \label{eq:precision}
 \end{equation}
-
 \begin{equation}
-	\text{\it{recall}} =\frac {\text{TP}}{\text{TP} + \text{FN}} \text{,}
+	\text{recall} =\frac {\text{TP}}{\text{TP} + \text{FN}} \text{.}
 \label{eq:recall}
 \end{equation}
 
-Precision metric of the model tells us how many accurate positive predictions have been made based on the equation \ref{eq:precision} and recall how well the model covered all true positives from the positive sample set. as shown on equation \ref{eq:recall}. The F1 score is a relative metric that tells us how well our chosen transformer model in the GPL adaptation extracts sentiment polarity from semantics and shows overall performance for each possible sentiment class triplet.
-
-% \subsection*{Testing approach}
-% Naslov morda še ni ustrezen in se bo prilagodil.
-% Katero metriko uporabimo za primerjavo rezultatov, kako iz sentence embedding pridemo do klasifikacije povedi.
+Precision metric of the model tells us how many accurate positive predictions have been made based on the equation \ref{eq:precision} and recall how well the model covered all true positives from the positive sample set as shown in equation \ref{eq:recall}. The F1 score is a relative metric that tells us how well our chosen model extracts sentiment polarity from semantics and shows overall performance for each possible sentiment class triplet.
 
 
-\subsection*{Classifer}
 
-To be able to test the base model and its fine-tuned variants on the sentiment classification problem, we prepared a simple classifier. The classifier takes a sentence encoding of length 384 and transforms it into a vector of size 3 - the number of classes in our classification problem. The transformation is done via a trainable linear layer. Softmax is used on this vector to obtain probabilities for each of the classes and as the output of the classifier model the class with the highest probability is returned.
+\subsection*{Classifier}
+
+To be able to test the base model and its fine-tuned variants on the sentiment classification problem, we prepared a simple classifier. The classifier takes a sentence encoding of length 384 (or 768 if the base model is {\it SloBERTa}) and transforms it into a vector of size 3 - the number of classes in our classification problem. The transformation is done via a trainable linear layer. Softmax is used on this vector to obtain probabilities for each of the classes and as the output of the classifier model the class with the highest probability is returned.
 
 For each model that we evaluated, a new classifier was trained. All of the classifiers were trained on the same training set and used the same validation set. Data was split into batches of size 32, we used learning rate 0.001 with the Adam optimizer and trained the classifier for 10 epochs. The classifier model with the highest F1 score on the validation set was chosen.
 
@@ -245,17 +237,17 @@ For each model that we evaluated, a new classifier was trained. All of the class
 \subsection*{TSDAE}
 
 For TSDAE fine-tuning we first prepare our dataset split and then select our base model.
-We choose a sentence-transformers model {\it paraphrase-multilingual-MiniLM-L12-v2}~\cite{reimers-2019-sentence-bert} as our starting point of training,
-which maps sentences to 384 dimensional vectors or sentence encodings.
+We choose a sentence-transformer model {\it paraphrase-multilingual-MiniLM-L12-v2} as our starting point of training, which maps sentences to 384 dimensional vectors or sentence encodings. The second base model SloBERTa was also fine-tuned using this approach.
 
 We take the training data of our split dataset and corrupt the sentences by removing words using the {\it DenoisingAutoEncoderDataset}. This function is used in combination with {\it DenoisingAutoEncoderLoss} which tries to reconstruct the sentences without noise.
 
-We train the model using batch size 32, 5 epochs and learning rate of 3e-5. We then train a classifier to predict sentiment from the 384 dimensional vectors. We calculate the precision, recall, accuracy and F1 score shown in Table~\ref{tab2}.
+We train the model using batch size 32, 10 epochs and learning rate of 3e-5. We then train a classifier to predict sentiment from the 384-dimensional vectors (or 768 for SloBERTa). We calculate the precision, recall and F1 score on the test dataset.
+
 
 \subsection*{GPL}
-For training our GPL model we first trained two models with different T5 doc2query approaches for query qeneration. For creating a model without Slovene language recognition we use the docT5query model, also known as {\it msmarco-14langs-mt5-base-v1} \cite{msmarco14langs}, and specifically for learning Slovene language we use the {\it slv\_doc2query} \cite{boshko} transformer model. 
+The fine-tuning with the GPL method consisted of training two versions. Each one was fine-tuned using a different T5 model for query qeneration. The training dataset of the first T5 model did not include the Slovene language, this model is also known as {\it msmarco-14langs-mt5-base-v1}~\cite{msmarco14langs}. The second choice for the T5 model is made specifically for the Slovene language and producing Slovene queries, this is the {\it slv\_doc2query}~\cite{boshko} transformer model.
 
-We train the model with the parameters set as batch size to 32, 140 000 steps, 50 negatives per query and for the score evaluation method for dense vector retrieval we use computation of cosine similarity, which also works for usage of the default hybrid retriever in combination of {\it msmarco-distilbert-base-v3 } \cite{msmarcodistil} and {\it msmarco-MiniLM-L-6-v3} \cite{msmarcominilm} for negative mining. After fine-tuning with the GPL, we train the classifier that to receive 384 vector embedding from encoded data for evaluation, similar to our TSDAE.
+We train the model for 140 000 steps, with the batch size set to 32, generating 3 queries per sentence and 50 negative examples per query. For the score evaluation method for dense vector retrieval we use computation of cosine similarity, which also works for usage of the default hybrid retriever in combination of {\it msmarco-distilbert-base-v3 }~\cite{msmarcodistil} and {\it msmarco-MiniLM-L-6-v3}~\cite{msmarcominilm} for negative mining. After fine-tuning the chosen base model with the GPL, we train a classifier that receives as input 384-dimensional vector embedding (or 768 in the case of SloBERTa) and returns the sentiment classification. The results are evaluated in the same way as the base models and TSDAE fine-tuned models.
 
 
 %------------------------------------------------
