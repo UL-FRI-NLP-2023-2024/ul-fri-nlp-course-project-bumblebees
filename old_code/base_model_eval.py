@@ -71,5 +71,3 @@ print(f"Results on test set:\n  precision: {precision}\n  recall: {recall}\n  ac
 #   recall: 0.566
 #   accuracy: 0.566
 #   f1 score: 0.47977081602056115
-
-# Morda bi bil boljši pristop, da po sentence embeddingu damo torch.Linear plast (512->3), jo natreniramo, nato pa uporabimo Softmax in vzamemo max kot napoved.
