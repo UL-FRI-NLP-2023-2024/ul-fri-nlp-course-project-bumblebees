@@ -5,10 +5,18 @@ from matplotlib.ticker import FormatStrFormatter
 
 def draw_graph(results, base_model_f1, base_model, T5, set="test"):
     fig = plt.figure(figsize=(10,5))
-    plt.title(f"GPL_{T5}_{base_model} on {set} set")
-    plt.plot(results[0,:], np.ones(len(results[0,:])) * base_model_f1, label=base_model, color='r')
-    plt.plot(results[0,:], results[1,:], label='GPL versions')
-    
+    plt.title(f"GPL_{T5}{base_model} on {set} set")
+
+    if(set=="test"):
+        base_color = "r"
+        model_color = "b"
+    else:
+        base_color = "tab:orange"
+        model_color = "g"
+
+    plt.plot(results[0,:], np.ones(len(results[0,:])) * base_model_f1, label=base_model, color=base_color)
+    plt.plot(results[0,:], results[1,:], label='GPL versions', color=model_color)
+
     plt.xlabel("Number of steps")
     x_names = [f"{int(r/1000)}k" for r in results[0,:]]
     plt.xticks(results[0,:], x_names)
@@ -17,7 +25,7 @@ def draw_graph(results, base_model_f1, base_model, T5, set="test"):
     for i in range(14):
         plt.annotate(f"{results[1,i]:.4f}", results[:,i])
 
-    plt.annotate(f"{base_model_f1:.4f}", (results[0,0],base_model_f1+0.001), color='r')
+    plt.annotate(f"{base_model_f1:.4f}", (results[0,0],base_model_f1+0.001), color=base_color)
 
     plt.legend(loc='lower right')
     # plt.legend(loc='center right')
@@ -43,17 +51,34 @@ if __name__=="__main__":
     # path = "data/results_gpl_boshko_sloberta.txt"
     # base_model_f1 = 0.5867172613808097
     # base_model = "SloBERTa"
-    # T5 = "Boshko"
+    # T5 = "SLO_"
+    #path = "data/results_gpl_boshko_sloberta_updated.txt"
+    #base_model_f1 = 0.5867172613808097
+    #base_model = "SloBERTa"
+    #T5 = "SLO_"
 
-    path = "data/results_gpl.txt"
-    base_model_f1 = 0.5637068742661127
-    base_model = "paraphrase"
-    T5 = "14langs"
+    #path = "data/results_gpl.txt"
+    #base_model_f1 = 0.5637068742661127
+    #base_model = "paraphrase"
+    #T5 = ""
+    #path = "data/results_gpl_updated.txt"
+    #base_model_f1 = 0.5637068742661127
+    #base_model = "paraphrase"
+    #T5 = ""
 
     # path = "data/results_gpl_boshko.txt"
     # base_model_f1 = 0.5637068742661127
     # base_model = "paraphrase"
-    # T5 = "Boshko"
+    # T5 = "SLO_"
+    #path = "data/results_gpl_boshko_updated.txt"
+    #base_model_f1 = 0.5637068742661127
+    #base_model = "paraphrase"
+    #T5 = "SLO_"
+
+    path = "data/results_gpl_sloberta_updated.txt"
+    base_model_f1 = 0.5867172613808097
+    base_model = "SloBERTa"
+    T5 = ""
 
     results_train = np.zeros((2, 14))
     results_test = np.zeros((2, 14))
@@ -61,7 +86,7 @@ if __name__=="__main__":
     with open(path) as f:
         line = f.readline()[1:-2]
         results_train = read_data(line, 14)
-        
+
         line = f.readline()[1:-2]
         results_test = read_data(line, 14)
 
