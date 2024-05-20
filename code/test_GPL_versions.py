@@ -59,7 +59,7 @@ def train_clf(n, train_text, train_labels, val_text, val_labels):
     train_classifier(train_dataloader, val_dataloader, model, criterion, optimizer, device, epochs_clf, clf)
 
 
-def eval(n, test_text=None, test_labels=None, test_batch_size=1):
+def eval(n, test_text=None, test_labels=None, test_batch_size=1, set="test"):
     print(f"Evaluating the GPL fine-tuned MODEL with {n} steps.")
     model_name = base_model_name(n)
     clf = clf_name(n)
@@ -67,7 +67,7 @@ def eval(n, test_text=None, test_labels=None, test_batch_size=1):
     model_predictions = predictions(test_text, test_labels, device, test_batch_size, input_dim, output_dim, model_name=model_name, clf_name=clf)
 
     m_precision, m_recall, m_accuracy, m_f1 = calculate_measures(test_labels, model_predictions)
-    print(f"GPL fine-tuned MODEL with {n} steps\n  Results on test set:\n    precision: {m_precision}\n    recall: {m_recall}\n    accuracy: {m_accuracy}\n    f1 score: {m_f1}")
+    print(f"GPL fine-tuned MODEL with {n} steps\n  Results on {set} set:\n    precision: {m_precision}\n    recall: {m_recall}\n    accuracy: {m_accuracy}\n    f1 score: {m_f1}")
 
     return m_f1
 
@@ -82,13 +82,21 @@ if __name__=='__main__':
     # Loading test dataset:
     test_text, test_labels = prepare_dataset(train=False)
 
+    all_train_f1 = []
     all_f1 = []
 
     for i in range(1, steps+1):
         n = i * gpl_step_size
         train_clf(n, train_text, train_labels, val_text, val_labels)
+
+        # F1 nad učnimi podatki:
+        train_f1 = eval(n, train_text, train_labels)
+        all_train_f1.append(n,train_f1)
+        # F1 nad testnimi podatki:
         f1 = eval(n, test_text, test_labels)
         all_f1.append((n,f1))
 
     print("\n")
-    print(all_f1)
+    print(all_f1, set="test")
+    print("\n")
+    print(all_train_f1, set="train")

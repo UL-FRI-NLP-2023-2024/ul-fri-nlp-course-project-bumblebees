@@ -3,9 +3,9 @@ from matplotlib import pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
 
 
-def draw_graph(results, base_model_f1, base_model, T5):
+def draw_graph(results, base_model_f1, base_model, T5, set="test"):
     fig = plt.figure(figsize=(10,5))
-    plt.title(f"GPL_{T5}_{base_model}")
+    plt.title(f"GPL_{T5}_{base_model} on {set} set")
     plt.plot(results[0,:], np.ones(len(results[0,:])) * base_model_f1, label=base_model, color='r')
     plt.plot(results[0,:], results[1,:], label='GPL versions')
     
@@ -21,8 +21,22 @@ def draw_graph(results, base_model_f1, base_model, T5):
 
     plt.legend(loc='lower right')
     # plt.legend(loc='center right')
-    plt.savefig(f"report/fig/GPL_{T5}_{base_model}", dpi=300)
+    plt.savefig(f"report/fig/GPL_{T5}_{base_model}_{set}", dpi=300)
     plt.show()
+
+
+def read_data(line, n):
+    results = np.zeros((2, n))
+    i = 0
+    for tup in line.split("), "):
+        if i == 13:
+            steps, f1 = tup[1:-1].split(", ")
+        else:
+            steps, f1 = tup[1:].split(", ")
+        results[0, i] = float(steps)
+        results[1, i] = float(f1)
+        i+=1
+    return results
 
 
 if __name__=="__main__":
@@ -41,18 +55,15 @@ if __name__=="__main__":
     # base_model = "paraphrase"
     # T5 = "Boshko"
 
-    results = np.zeros((2, 14))
+    results_train = np.zeros((2, 14))
+    results_test = np.zeros((2, 14))
 
     with open(path) as f:
-        line = f.read()[1:-1]
-        i = 0
-        for tup in line.split("), "):
-            if i == 13:
-                steps, f1 = tup[1:-1].split(", ")
-            else:
-                steps, f1 = tup[1:].split(", ")
-            results[0, i] = float(steps)
-            results[1, i] = float(f1)
-            i+=1
+        line = f.readline()[1:-2]
+        results_train = read_data(line, 14)
+        
+        line = f.readline()[1:-2]
+        results_test = read_data(line, 14)
 
-    draw_graph(results, base_model_f1, base_model, T5)
+    draw_graph(results_train, base_model_f1, base_model, T5, set="train")
+    draw_graph(results_test, base_model_f1, base_model, T5, set="test")
