@@ -25,14 +25,20 @@ output_dim = params_clf["output_dim"]
 
 # Models:
 def base_model_name(n):
-    return f"models/paraphrase_MiniLM_gpl_boshko_sloberta.pth/{n}"
-    # return f"models/paraphrase_MiniLM_gpl.pth/{n}"
-    # return f"models/paraphrase_MINILM_gpl_boshko.pth/{n}"
+    return f"models/paraphrase_MiniLM_gpl.pth/{n}" #GPL base paraphrase nad t5 msmarco
+    #return f"models/paraphrase_MINILM_gpl_boshko.pth/{n}" #GPL base paraphrase nad t5 slo (boshko)
+
+    #return f"models/gpl_embeddia_msmarco.pth/{n}" #GPL base sloberta nad t5 msmarco
+    #return f"models/gpl_embeddia_boshko.pth/{n}" #GPL base sloberta nad t5 slo (boshko)
+
 
 def clf_name(n):
-    return f"models/classifier_gpl_boshko_sloberta_{n}.pth"
-    #return f"models/classifier_gpl_{n}.pth"
-    #return f"models/classifier_gpl_boshko_{n}.pth"
+    return f"models/classifier_paraphrase_MiniLM_gpl.pth_{n}" #GPL base paraphrase nad t5 msmarco
+    #return f"models/classifier_paraphrase_MINILM_gpl_boshko.pth_{n}" #GPL base paraphrase nad t5 slo (boshko)
+
+    #return f"models/classifier_gpl_embeddia_msmarco.pth_{n}" #GPL base sloberta nad t5 msmarco
+    #return f"models/classifier_gpl_embeddia_boshko.pth_{n}" #GPL base sloberta nad t5 slo (boshko)
+
 
 
 def train_clf(n, train_text, train_labels, val_text, val_labels):
@@ -87,7 +93,7 @@ if __name__=='__main__':
 
     for i in range(1, steps+1):
         n = i * gpl_step_size
-        train_clf(n, train_text, train_labels, val_text, val_labels)
+        #train_clf(n, train_text, train_labels, val_text, val_labels)
 
         # F1 nad učnimi podatki:
         train_f1 = eval(n, train_text, train_labels)
@@ -97,6 +103,6 @@ if __name__=='__main__':
         all_f1.append((n,f1))
 
     print("\n")
-    print(all_f1, set="test")
-    print("\n")
     print(all_train_f1, set="train")
+    print("\n")
+    print(all_f1, set="test")
