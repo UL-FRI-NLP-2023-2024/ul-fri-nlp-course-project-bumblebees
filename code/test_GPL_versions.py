@@ -48,7 +48,7 @@ def train_clf(n, train_text, train_labels, val_text, val_labels):
 
     fine_tuned_model = SentenceTransformer(model_name).to(device)
 
-    # Encode data to get 384 len embeddings (or 768 for SloBERTa) and train classifier for 3 len embeddings
+    # Encode data to get 384 len embeddings (or 768 foajar SloBERTa) and train classifier for 3 len embeddings
     train_embedds = fine_tuned_model.encode(train_text)
     val_embedds = fine_tuned_model.encode(val_text)
 
@@ -96,10 +96,10 @@ if __name__=='__main__':
         #train_clf(n, train_text, train_labels, val_text, val_labels)
 
         # F1 nad učnimi podatki:
-        train_f1 = eval(n, train_text, train_labels)
-        all_train_f1.append(n,train_f1)
+        train_f1 = eval(n, train_text, train_labels, set="train")
+        all_train_f1.append((n,train_f1))
         # F1 nad testnimi podatki:
-        f1 = eval(n, test_text, test_labels)
+        f1 = eval(n, test_text, test_labels, set="test")
         all_f1.append((n,f1))
 
     print("\n")
