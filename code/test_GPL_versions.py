@@ -103,6 +103,6 @@ if __name__=='__main__':
         all_f1.append((n,f1))
 
     print("\n")
-    print(all_train_f1, set="train")
+    print(all_train_f1)
     print("\n")
-    print(all_f1, set="test")
+    print(all_f1)

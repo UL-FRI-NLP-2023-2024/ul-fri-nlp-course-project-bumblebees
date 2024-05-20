@@ -303,21 +303,11 @@ A new classifier was trained with the same parameters for each of the stated mod
 \end{table}
 
 
-We observe that both fine-tuned methods achieve lower F1 score than the base model, therefore perform
-worse on our sentiment classification problem. The highest F1 score, besides the base model, is attained
-with TSDAE fine-tuning using 10 epochs. Comparing all TSDAE models, we notice that training using 5 epochs
-is not a sufficient amount as the F1 score is slightly lower than training with 10 epochs and we assume the model
-does not learn as much. On the other hand, training with 15 epochs also achieves a lower score, but we
-assume this is due to the start of overfitting of our model.
+We observe that both fine-tuned methods achieve lower F1 score than the base model, therefore perform worse on our sentiment classification problem. The highest F1 score, besides the base model, is attained with TSDAE fine-tuning using 10 epochs. Comparing all TSDAE models, we notice that training using 5 epochs is not a sufficient amount as the F1 score is slightly lower than training with 10 epochs and we assume the model does not learn as much. On the other hand, training with 15 epochs also achieves a lower score, but we assume this is due to the start of overfitting of our model.
 
-For GPL fine-tuned models we observe that $\text{GPL}_{SLO}$ performs better than GPL in terms of the F1 score
-by 32.88\%.
-This is because the T5 model used in GPL returns incomprehensible queries and in other languages than Slovenian
-since Slovenian was not a part of its training dataset.
-Because we are training our model on Slovenian sentences, this T5 model is not ideal for our GPL fine-tuning. We
-proved this by using a T5 model {\it slv\_doc2query} which was trained only for Slovenian language.
-We can compare the returned queries for both models in Table \ref*{queries}.
-
+For GPL fine-tuned models we observe that $\text{GPL}_{SLO}$ performs better than GPL in terms of the F1 score by 32.88\%. This is because the T5 model used in GPL returns incomprehensible queries and in other languages than Slovenian
+since Slovenian was not a part of its training dataset. Because we are training our model on Slovenian sentences, this T5 model is not ideal for our GPL fine-tuning. We
+proved this by using a T5 model {\it slv\_doc2query} which was trained only for the Slovenian language. We can compare the returned queries for both models in Table \ref*{queries}.
 
 \begin{table}[!h]
     \tiny
@@ -375,22 +365,38 @@ Results, compared to the base model, are presented in Table~\ref{tab3}.
 
 \subsection*{Intermediate models in GPL}
 \label{intermediate-paraphrase}
-Since we used the \textit{gpl} library for fine-tuning a chosen model with the GPL method, it allowed us to save intermediate models during this process. The GPL method fine-tunes the model for 140 000 steps by default and saves a model every 10 000 steps. Thus we obtained 13 intermediate and 1 final model. We trained a classifier for each of the models and evaluated them on the test set part of the SentiNews dataset~\cite{sentiNews}. The results were plotted and are shown in Figure~\ref{fig:gpl-versions} for GPL and in Figure~\ref{fig:gpl-slo-versions} for $\text{GPL}_{SLO}$.
+Since we used the \textit{gpl} library for fine-tuning a chosen model with the GPL method, it allowed us to save intermediate models during this process. The GPL method fine-tunes the model for 140 000 steps by default and saves a model every 10 000 steps. Thus we obtained 13 intermediate and 1 final model. We trained a classifier for each of the models and evaluated them on the train and test set parts of the SentiNews dataset~\cite{sentiNews}. The results were plotted and are shown in Figure~\ref{fig:gpl-versions-train} and Figure~\ref{fig:gpl-versions} for GPL and in Figure~\ref{fig:gpl-slo-versions-train} and Figure~\ref{fig:gpl-slo-versions} for $\text{GPL}_{SLO}$.
 
-\begin{figure}[ht]\centering
-	\vspace{12 pt}
-	\includegraphics[width=\linewidth]{GPL_14langs_paraphrase.png}
-	\vspace{5 pt}
-	\caption{Visualisation of the F1 score evaluated on models, obtained during fine-tuning with the GPL method with {\it msmarco-14langs-mt5-base-v1} \cite{msmarco14langs} for the T5 model.}
-	\label{fig:gpl-versions}
+\begin{figure}
+    \centering
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{GPL__paraphrase_train.png}
+        \caption{F1 score on \textit{train} set evaluated on models, obtained during fine-tuning with the GPL method with {\it msmarco-14langs-mt5-base-v1} \cite{msmarco14langs} for the T5 model.}
+		\label{fig:gpl-versions-train}
+    \end{minipage}\hfill
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{GPL__paraphrase_test.png}
+        \caption{F1 score on \textit{test} set evaluated on models, obtained during fine-tuning with the GPL method with {\it msmarco-14langs-mt5-base-v1} \cite{msmarco14langs} for the T5 model.}
+		\label{fig:gpl-versions}
+    \end{minipage}
 \end{figure}
 
-\begin{figure}[ht]\centering
-	\vspace{12 pt}
-	\includegraphics[width=\linewidth]{GPL_Boshko_paraphrase.png}
-	\vspace{5 pt}
-	\caption{Visualisation of the F1 score evaluated on models, obtained during fine-tuning with the GPL method with {\it slv\_doc2query}~\cite{boshko} for the T5 model.}
-	\label{fig:gpl-slo-versions}
+\begin{figure}
+    \centering
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{GPL_SLO__paraphrase_train.png}
+        \caption{F1 score on \textit{train} set evaluated on models, obtained during fine-tuning with the GPL method with {\it slv\_doc2query}~\cite{boshko} for the T5 model.}
+		\label{fig:gpl-slo-versions-train}
+    \end{minipage}\hfill
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{GPL_SLO__paraphrase_test.png}
+        \caption{F1 score on \textit{test} set evaluated on models, obtained during fine-tuning with the GPL method with {\it slv\_doc2query}~\cite{boshko} for the T5 model.}
+		\label{fig:gpl-slo-versions}
+    \end{minipage}
 \end{figure}
 
 % REZULTATE MORAMO ŠE POKOMENTIRATI - ampak kako?
@@ -475,16 +481,39 @@ Results, compared to the base model, are presented in Table~\ref{tab5}.
 
 
 \subsection*{Intermediate models in GPL}
-As explained in section~\ref{intermediate-paraphrase}, we exctracted the intermediate models when fine-tuning with the GPL method. A model was saved every 10 000 steps, thus resulting in 13 intermediate and one final model. A classifier was trained for each of the models and evaluated on the test set of the SentiNews dataset~\cite{sentiNews}. The results (F1 score) are shown in FigureŠENEOBSTAJA for GPL and in Figure~\ref{fig:gpl-slo-sloberta-versions} for $\text{GPL}_{SLO}$.
+As explained in the case of {\it paraphrase-multilingual-MiniLM-L12-v2} model, we extracted the intermediate models when fine-tuning with the GPL method. A model was saved every 10 000 steps, thus resulting in 13 intermediate and one final model. A classifier was trained for each of the models and evaluated on the train and test set of the SentiNews dataset~\cite{sentiNews}. The results (F1 score) are shown in Figure~\ref{fig:gpl-sloberta-versions-train} and Figure~\ref{fig:gpl-sloberta-versions} for GPL and in Figure~\ref{fig:gpl-sloberta-slo-versions-train} and Figure~\ref{fig:gpl-sloberta-slo-versions} for $\text{GPL}_{SLO}$.
 
-\begin{figure}[ht]\centering
-	\vspace{12 pt}
-	\includegraphics[width=\linewidth]{GPL_Boshko_SloBERTa.png}
-	\vspace{5 pt}
-	\caption{Visualisation of the F1 score evaluated on models, obtained during fine-tuning with the GPL method with {\it slv\_doc2query}~\cite{boshko} for the T5 model.}
-	\label{fig:gpl-slo-sloberta-versions}
+\begin{figure}
+    \centering
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{GPL__SloBERTa_train.png}
+        \caption{F1 score on \textit{train} set evaluated on models, obtained during fine-tuning with the GPL method with {\it msmarco-14langs-mt5-base-v1} \cite{msmarco14langs} for the T5 model.}
+		\label{fig:gpl-sloberta-versions-train}
+    \end{minipage}\hfill
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{GPL__SloBERTa_test.png}
+        \caption{F1 score on \textit{test} set evaluated on models, obtained during fine-tuning with the GPL method with {\it msmarco-14langs-mt5-base-v1} \cite{msmarco14langs} for the T5 model.}
+		\label{fig:gpl-sloberta-versions}
+    \end{minipage}
 \end{figure}
 
+\begin{figure}
+    \centering
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{GPL_SLO__SloBERTa_train.png}
+        \caption{F1 score on \textit{train} set evaluated on models, obtained during fine-tuning with the GPL method with {\it slv\_doc2query}~\cite{boshko} for the T5 model.}
+		\label{fig:gpl-sloberta-slo-versions-train}
+    \end{minipage}\hfill
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{GPL_SLO__SloBERTa_test.png}
+        \caption{F1 score on \textit{test} set evaluated on models, obtained during fine-tuning with the GPL method with {\it slv\_doc2query}~\cite{boshko} for the T5 model.}
+		\label{fig:gpl-sloberta-slo-versions}
+    \end{minipage}
+\end{figure}
 
 % REZULTATE MORAMO ŠE POKOMENTIRATI
 
