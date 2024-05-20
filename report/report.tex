@@ -19,13 +19,16 @@
 %	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
 %----------------------------------------------------------------------------------------
 \documentclass[fleqn,moreauthors,10pt]{ds_report}
-\usepackage[english]{babel}
+\usepackage[russian,english]{babel}
+\usepackage[T2A,T1]{fontenc}
 \usepackage{amsmath}
+
 \graphicspath{{fig/}}
 
 \usepackage{multirow}
 \usepackage{makecell}
 \usepackage{hhline}
+\usepackage{makecell}
 
 \usepackage{color, colortbl}
 \definecolor{Blue}{rgb}{0.8549,0.9098,0.9882}
@@ -286,7 +289,7 @@ A new classifier was trained with the same parameters for each of the stated mod
 		Base model & 0.6124 & 0.6014 & 0.5637\\
 		\hline
 		$\text{TSDAE}^{5}$ & 0.5682 & 0.5598 & 0.4968\\
-		TSDAE & 0.5638 & 0.5702 & 0.5277\\
+		TSDAE &  0.5673 & 0.571 & 0.5257\\
 		$\text{TSDAE}^{15}$ & 0.567 & 0.5665 & 0.5142\\
 		\hline
 		GPL & 0.4651 & 0.5104 & 0.3857\\
@@ -299,7 +302,45 @@ A new classifier was trained with the same parameters for each of the stated mod
 \label{tab2}
 \end{table}
 
-% REZULTATE MORAMO ŠE POKOMENTIRATI
+
+We observe that both fine-tuned methods achieve lower F1 score than the base model, therefore perform
+worse on our sentiment classification problem. The highest F1 score, besides the base model, is attained
+with TSDAE fine-tuning using 10 epochs. Comparing all TSDAE models, we notice that training using 5 epochs
+is not a sufficient amount as the F1 score is slightly lower than training with 10 epochs and we assume the model
+does not learn as much. On the other hand, training with 15 epochs also achieves a lower score, but we
+assume this is due to the start of overfitting of our model.
+
+For GPL fine-tuned models we observe that $\text{GPL}_{SLO}$ performs better than GPL in terms of the F1 score
+by 32.88\%.
+This is because the T5 model used in GPL returns incomprehensible queries and in other languages than Slovenian
+since Slovenian was not a part of its training dataset.
+Because we are training our model on Slovenian sentences, this T5 model is not ideal for our GPL fine-tuning. We
+proved this by using a T5 model {\it slv\_doc2query} which was trained only for Slovenian language.
+We can compare the returned queries for both models in Table \ref*{queries}.
+
+
+\begin{table}[!h]
+    \tiny
+    \begin{center}
+        \begin{tabular}{ |c|c|c| }
+        \hline
+        T5 model & Sentence & Queries \\
+        \hline
+        \multirow{3}{*}{{\it msmarco-14langs-mt5-base-v1}} & \multirow{3}{*}{\makecell{Bo evropska komisija \\ analizirala vzroke \\ rasti cen hrane.}} & evroeuropeana komisija \\
+                            &                      & evroeuropeana komisija \\
+                            &                      & bo europeana komisija \foreignlanguage{russian}{analizировала точки}
+
+							\\
+        \hline
+        \multirow{3}{*}{{\it slv\_doc2query}} & \multirow{3}{*}{\makecell{Bo evropska komisija \\ analizirala vzroke \\ rasti cen hrane.}} & Kateri je glavni vzrok za rast cen hrane? \\
+                                &                      & vzroki za rast cen hrane \\
+                                &                      & Kaj povzroča rast cen hrane? \\
+        \hline
+        \end{tabular}
+    \end{center}
+    \caption{Examples of queries returned by each T5 model for the given sentence.}
+    \label{queries}
+\end{table}
 
 
 \subsection*{Combining the methods}
@@ -352,7 +393,12 @@ Since we used the \textit{gpl} library for fine-tuning a chosen model with the G
 	\label{fig:gpl-slo-versions}
 \end{figure}
 
-% REZULTATE MORAMO ŠE POKOMENTIRATI
+% REZULTATE MORAMO ŠE POKOMENTIRATI - ampak kako?
+
+From the graphs we notice that having lower amount of steps, up to 40 000, gives better results for both GPL models.
+We also observe that the F1 score starts rising again when we use 120 000 steps or more. Having more steps than this
+might lead into overfitting. In all cases, the F1 score is still lower than the base model.
+
 
 
 \subsection*{\large{2. SloBERTa}}
@@ -361,7 +407,7 @@ We decided to also fine-tune and evaluate a different base model, that is {\it S
 	\item base model {\it SloBERTa},
 	\item base model fine-tuned with the TSDAE method, trained for 10 epochs - denoted as TSDAE,
 	\item base model fine-tuned with the GPL method and {\it msmarco-14langs-mt5-base-v1} \cite{msmarco14langs} for the T5 model - denoted as GPL and
-	\item base model fine-tuned with the GPL method and {\it slv\_doc2query}~\cite{boshko} for the T5 model - denoted as $\text{GPL}_{SLO}$.
+	\item base model fine-tuned with the GPL method and \\{\it slv\_doc2query}~\cite{boshko} for the T5 model - denoted as $\text{GPL}_{SLO}$.
 \end{itemize}
 
 As in the case of {\it paraphrase-multilingual-MiniLM-L12-v2}, a new classifier was trained for each of the models. Evaluation was once again done on the test set of the SentiNews dataset~\cite{sentiNews}. The results are presented in Table~\ref{tab4}.
@@ -378,7 +424,7 @@ As in the case of {\it paraphrase-multilingual-MiniLM-L12-v2}, a new classifier 
 		\hline
 		TSDAE & 0.631 & 0.6219 & 0.5955\\
 		\hline
-		GPL & 0.v & 0.v & 0.v\\
+		GPL & 0.5898 & 0.593 & 0.5635\\
 		$\text{GPL}_{SLO}$ & 0.5914 & 0.5854 & 0.545\\
 
 		\hline
@@ -388,7 +434,14 @@ As in the case of {\it paraphrase-multilingual-MiniLM-L12-v2}, a new classifier 
 \label{tab4}
 \end{table}
 
-% REZULTATE MORAMO ŠE POKOMENTIRATI
+Comparing Tables \ref*{tab2} and \ref*{tab4} we notice that all models using the {\it SloBERTa} base model get an
+improved F1 score. TSDAE gets a 12,84\% of improvement, while $\text{GPL}_{SLO}$ gets 6,34\%.
+The most noticable improvement is with the GPL model which gets tremendous improvement of 46,1\% compared to the previously used
+base model.
+
+Despite the previously used base model, {\it paraphrase-\\multilingual-MiniLM-L12-v2}, being trained on Slovenian among the 50 languages used
+for training, the monolingual current base model, {\it SloBERTa}, works better as it is solely trained for Slovene.
+Because our classification task is on Slovenian sentences, this model is better suited for our language needs.
 
 
 \subsection*{Combining the methods}
@@ -408,8 +461,8 @@ Results, compared to the base model, are presented in Table~\ref{tab5}.
 		\hline
 
 		Base model & 0.6416 & 0.6209 & 0.5867\\
-		TSDAE+$\text{GPL}_{SLO}$ & 0.v & 0.v & 0.v\\
-		$\text{GPL}_{SLO}$+TSDAE & 0.5882 & 0.5956 & 0.5784\\
+		TSDAE+$\text{GPL}_{SLO}$ & 0.5882 & 0.5956 & 0.5784\\
+		$\text{GPL}_{SLO}$+TSDAE & 0.v & 0.v & 0.v\\
 
 		\hline
 		\end{tabular}
@@ -434,6 +487,11 @@ As explained in section~\ref{intermediate-paraphrase}, we exctracted the interme
 
 
 % REZULTATE MORAMO ŠE POKOMENTIRATI
+
+We notice that the best F1 score is given by training $\text{GPL}_{SLO}$ for 20 000 steps. This value is almost as good
+as the base model F1 score, but doesn't surpass it. Comparing \ref*{fig:gpl-slo-sloberta-versions} and \ref*{fig:gpl-slo-versions}
+we clearly see how better our model performs by simply changing the base model. Training for more that 120 000 steps probably
+leads into overfitting, despite the suggested~\cite{GPL} 140 000 steps.
 
 
 
