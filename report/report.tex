@@ -26,13 +26,15 @@
 \graphicspath{{fig/}}
 
 \usepackage{multirow}
-\usepackage{makecell}
 \usepackage{hhline}
 \usepackage{makecell}
+\usepackage{array}
 
 \usepackage{color, colortbl}
 \definecolor{Blue}{rgb}{0.8549,0.9098,0.9882}
 \definecolor{Red}{rgb}{0.9725,0.8078,0.8}
+\definecolor{Yellow}{rgb}{0.9961,0.9463,0.79688}
+\definecolor{Gray}{rgb}{0.9098,0.9098,0.9137}
 
 
 %----------------------------------------------------------------------------------------
@@ -272,7 +274,7 @@ The fine-tuning and evaluation was first executed on the {\it paraphrase-multili
 	\item base model fine-tuned with the TSDAE method, trained for 10 epochs - denoted as TSDAE,
 	\item base model fine-tuned with the TSDAE method, trained for 15 epochs - denoted as $\text{TSDAE}^{15}$,
 	\item base model fine-tuned with the GPL method and {\it msmarco-14langs-mt5-base-v1} \cite{msmarco14langs} for the T5 model - denoted as GPL and
-	\item base model fine-tuned with the GPL method and {\it slv\_doc2query}~\cite{boshko} for the T5 model - denoted as $\text{GPL}_{SLO}$.
+	\item base model fine-tuned with the GPL method and \\{\it slv\_doc2query}~\cite{boshko} for the T5 model - denoted as $\text{GPL}_{SLO}$.
 \end{itemize}
 
 A new classifier was trained with the same parameters for each of the stated models. They were evaluated on the test set part of the SentiNews dataset~\cite{sentiNews}. The results are presented in Table~\ref{tab2}.
@@ -286,14 +288,14 @@ A new classifier was trained with the same parameters for each of the stated mod
 		%\hhline{|=|=|=|=|}
 		\hline
 
-		Base model & 0.6124 & 0.6014 & 0.5637\\
+		Base model & 0.6124 & 0.6014 & \textbf{0.5637}\\
 		\hline
 		$\text{TSDAE}^{5}$ & 0.5682 & 0.5598 & 0.4968\\
-		TSDAE &  0.5673 & 0.571 & 0.5257\\
+		TSDAE &  0.5673 & 0.571 & \textbf{0.5257}\\
 		$\text{TSDAE}^{15}$ & 0.567 & 0.5665 & 0.5142\\
 		\hline
 		GPL & 0.4651 & 0.5104 & 0.3857\\
-		$\text{GPL}_{SLO}$ & 0.5641 & 0.5663 & 0.5125\\
+		$\text{GPL}_{SLO}$ & 0.5641 & 0.5663 & \textbf{0.5125}\\
 
 		\hline
 		\end{tabular}
@@ -305,26 +307,23 @@ A new classifier was trained with the same parameters for each of the stated mod
 
 We observe that both fine-tuned methods achieve lower F1 score than the base model, therefore perform worse on our sentiment classification problem. The highest F1 score, besides the base model, is attained with TSDAE fine-tuning using 10 epochs. Comparing all TSDAE models, we notice that training using 5 epochs is not a sufficient amount as the F1 score is slightly lower than training with 10 epochs and we assume the model does not learn as much. On the other hand, training with 15 epochs also achieves a lower score, but we assume this is due to the start of overfitting of our model.
 
-For GPL fine-tuned models we observe that $\text{GPL}_{SLO}$ performs better than GPL in terms of the F1 score by 32.88\%. This is because the T5 model used in GPL returns incomprehensible queries and in other languages than Slovenian
-since Slovenian was not a part of its training dataset. Because we are training our model on Slovenian sentences, this T5 model is not ideal for our GPL fine-tuning. We
-proved this by using a T5 model {\it slv\_doc2query} which was trained only for the Slovenian language. We can compare the returned queries for both models in Table \ref*{queries}.
+For GPL fine-tuned models we observe that $\text{GPL}_{SLO}$ performs better than GPL in terms of the F1 score by 0.1268 or 32.88\%. This is because the T5 model used in GPL returns incomprehensible queries and in other languages than Slovenian,
+since Slovenian was not a part of its training dataset. Because we are fine-tuning our model on Slovenian sentences, this T5 model is not ideal for our GPL fine-tuning. We proved this by using a T5 model {\it slv\_doc2query} which was trained only for the Slovenian language. We can compare the returned queries for both models in Table \ref*{queries}.
 
 \begin{table}[!h]
     \tiny
     \begin{center}
         \begin{tabular}{ |c|c|c| }
         \hline
-        T5 model & Sentence & Queries \\
+        \rowcolor{Blue}T5 model & Sentence & Queries \\
         \hline
-        \multirow{3}{*}{{\it msmarco-14langs-mt5-base-v1}} & \multirow{3}{*}{\makecell{Bo evropska komisija \\ analizirala vzroke \\ rasti cen hrane.}} & evroeuropeana komisija \\
-                            &                      & evroeuropeana komisija \\
-                            &                      & bo europeana komisija \foreignlanguage{russian}{analizировала точки}
-
-							\\
+        \multirow{3}{*}{\makecell{{\it msmarco-14langs-}\\{\it mt5-base-v1}}} & \multirow{3}{*}{\makecell{Bo evropska komisija \\ analizirala vzroke \\ rasti cen hrane.}} & \cellcolor{Blue}evroeuropeana komisija \\
+         & & evro komisija \foreignlanguage{russian}{analizировала 'zogueность rastelaar'}?\\
+         & & \cellcolor{Blue}bo europeana komisija \foreignlanguage{russian}{analizировала точки} \\
         \hline
-        \multirow{3}{*}{{\it slv\_doc2query}} & \multirow{3}{*}{\makecell{Bo evropska komisija \\ analizirala vzroke \\ rasti cen hrane.}} & Kateri je glavni vzrok za rast cen hrane? \\
-                                &                      & vzroki za rast cen hrane \\
-                                &                      & Kaj povzroča rast cen hrane? \\
+        \multirow{3}{*}{{\it slv\_doc2query}} & \multirow{3}{*}{\makecell{Bo evropska komisija \\ analizirala vzroke \\ rasti cen hrane.}} & \cellcolor{Blue}Kateri je glavni vzrok za rast cen hrane? \\
+         & & vzroki za rast cen hrane \\
+         & & \cellcolor{Blue}Kaj povzroča rast cen hrane? \\
         \hline
         \end{tabular}
     \end{center}
@@ -349,8 +348,8 @@ Results, compared to the base model, are presented in Table~\ref{tab3}.
 		\rowcolor{Blue}Model & Precision & Recall & F1 score\\
 		\hline
 
-		Base model & 0.6124 & 0.6014 & 0.5637\\
-		TSDAE+$\text{GPL}_{SLO}$ & 0.v & 0.v & 0.v\\
+		Base model & 0.6124 & 0.6014 & \textbf{0.5637}\\
+		TSDAE+$\text{GPL}_{SLO}$ & 0.552 & 0.5555 & 0.496\\
 		$\text{GPL}_{SLO}$+TSDAE &  0.v & 0.v & 0.v\\
 
 		\hline
@@ -360,14 +359,14 @@ Results, compared to the base model, are presented in Table~\ref{tab3}.
 \label{tab3}
 \end{table}
 
-% REZULTATE MORAMO ŠE POKOMENTIRATI
+% TODO: REZULTATE MORAMO ŠE POKOMENTIRATI
 
 
 \subsection*{Intermediate models in GPL}
 \label{intermediate-paraphrase}
-Since we used the \textit{gpl} library for fine-tuning a chosen model with the GPL method, it allowed us to save intermediate models during this process. The GPL method fine-tunes the model for 140 000 steps by default and saves a model every 10 000 steps. Thus we obtained 13 intermediate and 1 final model. We trained a classifier for each of the models and evaluated them on the train and test set parts of the SentiNews dataset~\cite{sentiNews}. The results were plotted and are shown in Figure~\ref{fig:gpl-versions-train} and Figure~\ref{fig:gpl-versions} for GPL and in Figure~\ref{fig:gpl-slo-versions-train} and Figure~\ref{fig:gpl-slo-versions} for $\text{GPL}_{SLO}$.
+Since we used the \textit{gpl}\footnote{https://pypi.org/project/gpl/} library for fine-tuning a chosen model with the GPL method, it allowed us to save intermediate models during this process. The GPL method fine-tunes the model for 140 000 steps by default and saves a model every 10 000 steps. Thus we obtained 13 intermediate and 1 final model. We trained a classifier for each of the models and evaluated them on the train and test set parts of the SentiNews dataset~\cite{sentiNews}. The results were plotted and are shown in Figure~\ref{fig:gpl-versions-train} and Figure~\ref{fig:gpl-versions} for GPL and in Figure~\ref{fig:gpl-slo-versions-train} and Figure~\ref{fig:gpl-slo-versions} for $\text{GPL}_{SLO}$.
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \begin{minipage}{0.5\textwidth}
         \centering
@@ -399,11 +398,9 @@ Since we used the \textit{gpl} library for fine-tuning a chosen model with the G
     \end{minipage}
 \end{figure}
 
-% REZULTATE MORAMO ŠE POKOMENTIRATI - ampak kako?
+% REZULTATE MORAMO ŠE POKOMENTIRATI
 
-From the graphs we notice that having lower amount of steps, up to 40 000, gives better results for both GPL models.
-We also observe that the F1 score starts rising again when we use 120 000 steps or more. Having more steps than this
-might lead into overfitting. In all cases, the F1 score is still lower than the base model.
+From the graphs we notice, that the F1 score is lower than the base model for both variants and for all intermediate models. We notice that lowering the number of steps for GPL could results in better performance. Since the curves for the train and test datasets look quite similar, we are unsure if the drop of F1 score in Figure~\ref{fig:gpl-versions-train} between 70k and 110k steps is due to overfitting.
 
 
 
@@ -440,14 +437,9 @@ As in the case of {\it paraphrase-multilingual-MiniLM-L12-v2}, a new classifier 
 \label{tab4}
 \end{table}
 
-Comparing Tables \ref*{tab2} and \ref*{tab4} we notice that all models using the {\it SloBERTa} base model get an
-improved F1 score. TSDAE gets a 12,84\% of improvement, while $\text{GPL}_{SLO}$ gets 6,34\%.
-The most noticable improvement is with the GPL model which gets tremendous improvement of 46,1\% compared to the previously used
-base model.
+Comparing Tables \ref*{tab2} and \ref*{tab4} we notice that all models using the {\it SloBERTa} base model get an improved F1 score. TSDAE gets a 12.84\% improvement, while $\text{GPL}_{SLO}$ gets 6.34\% higher F1 score. The most noticable improvement is with the GPL model which gets tremendous improvement of 46,1\% compared to the previously used base model.
 
-Despite the previously used base model, {\it paraphrase-\\multilingual-MiniLM-L12-v2}, being trained on Slovenian among the 50 languages used
-for training, the monolingual current base model, {\it SloBERTa}, works better as it is solely trained for Slovene.
-Because our classification task is on Slovenian sentences, this model is better suited for our language needs.
+Despite the previously used base model {\it paraphrase-\\multilingual-MiniLM-L12-v2} being trained on a training dataset of 50 languages that included Slovenian, the monolingual (current) base model {\it SloBERTa} performs better, as it is solely trained for Slovene. Our sentiment classification problem is done on Slovenian sentences, thus making the {\it SloBERTa} model better suited for our language task.
 
 
 \subsection*{Combining the methods}
@@ -539,13 +531,20 @@ Ideje:
 - Prilagoditi bi morali korake v GPL, morda še katerega izmed drugih parametrov.
 - Testirati bi morali klasifikator s še kakšnimi drugimi parametri, morda bi ga lahko dlje trenirali in podobno.
 
+
+The tested unsupervised fine-tuning methods TSDAE and GPL did not prove to be useful for our Slovenian dataset and sentiment classification problem. The F1 scores we achieved on the test set with the fine-tuned models were all lower than the F1 scores of the base models. Comparing the two base models, {\it paraphrase-multilingual-MiniLM-L12-v2}~\cite{reimers-2019-sentence-bert} and {\it SloBERTa}~\cite{sloberta}, we did however notice that the latter performs better for sentiment classification of Slovenian sentences. This is most probably due to {\it SloBERTa} being trained only on Slovenian datasets, while for the {\it paraphrase-multilingual-MiniLM-L12-v2}, the Slovene language was only a part of the training set.
+
+The next logical step would be testing the methods on a much more specific domain. The SentiNews dataset was built from different Slovenian news, resulting in a vocabulary that is quite general. If we were to use a very specific dataset, we think that the comparison between the fine-tuned models with TSDAE and GPL method and just the base model might differ from the results achieved in this project.
+
+
+
 %------------------------------------------------
 
 
 
 \section*{Acknowledgments}
 
-Here you can thank other persons (advisors, colleagues ...) that contributed to the successful completion of your project.
+We thank our teaching assistant Boshko Koloski for sharing his expertise on the topic and encouraging our team to explore the tested methods.
 
 
 %----------------------------------------------------------------------------------------
