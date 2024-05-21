@@ -312,6 +312,8 @@ since Slovenian was not a part of its training dataset. Because we are fine-tuni
 
 \begin{table}[!h]
     \tiny
+	\setlength{\tabcolsep}{5pt}
+    \renewcommand{\arraystretch}{1.5}
     \begin{center}
         \begin{tabular}{ |c|c|c| }
         \hline
@@ -534,7 +536,7 @@ Ideje:
 
 The tested unsupervised fine-tuning methods TSDAE and GPL did not prove to be useful for our Slovenian dataset and sentiment classification problem. The F1 scores we achieved on the test set with the fine-tuned models were all lower than the F1 scores of the base models. Comparing the two base models, {\it paraphrase-multilingual-MiniLM-L12-v2}~\cite{reimers-2019-sentence-bert} and {\it SloBERTa}~\cite{sloberta}, we did however notice that the latter performs better for sentiment classification of Slovenian sentences. This is most probably due to {\it SloBERTa} being trained only on Slovenian datasets, while for the {\it paraphrase-multilingual-MiniLM-L12-v2}, the Slovene language was only a part of the training set.
 
-The next logical step would be testing the methods on a much more specific domain. The SentiNews dataset was built from different Slovenian news, resulting in a vocabulary that is quite general. If we were to use a very specific dataset, we think that the comparison between the fine-tuned models with TSDAE and GPL method and just the base model might differ from the results achieved in this project.
+The next logical step would be testing the methods on a much more specific domain. The SentiNews dataset was built from different Slovenian news, resulting in a vocabulary that is quite general. If we were to use a very specific dataset, we think that the comparison between the fine-tuned models with TSDAE and GPL method and just the base model might differ from the results achieved in this project. Since gathering data from specific domains in Slovene language may be sparse, the unsupervised learning we tested could prove useful for such purposes. For example, if we trained our fine-tuned TSDAE+$\text{GPL}_{SLO}$ or $\text{GPL}_{SLO}$+TSDAE on a sentiment dataset, which included Slovene sentences with reviews only for a specific product or range of products in the same category, then the model could achieve better results. We could also, before starting to evaluate the models, have trained the classificator with more datasets and longer epochs, to determine the best performant combination of hyperparameters.
 
 
 
