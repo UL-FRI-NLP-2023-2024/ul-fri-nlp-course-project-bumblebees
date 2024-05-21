@@ -16,12 +16,15 @@ mkdir containers
 ```
 
 1. Create Singularity container
+
+
 In order to start training the model we will first need to invoke the Singularity container builder, which will create a Singularity Image File (.sif) for us. For our purposes we use the Docker container for Pytorch. We do so by:
 ```
 singularity build ./containers/container-pytorch-onj.sif docker://pytorch/pytorch
 ```
 2. Install required libraries
-Then, we must install the required Python libraries in our newly created image by running:
+
+After initializing the container, we must install the required Python libraries for our newly created image by running:
 ```
 singularity exec ./containers/container-pytorch-onj.sif pip install sentence-transformers==2.7.0 numpy==1.26.4 scikit-metrics==0.1.0 datasets==2.19.0 nltk==3.8.1
 ```
