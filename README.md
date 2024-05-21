@@ -28,7 +28,7 @@ After initializing the container, we must install the required Python libraries 
 ```
 singularity exec ./containers/container-pytorch-onj.sif pip install sentence-transformers==2.7.0 numpy==1.26.4 scikit-metrics==0.1.0 datasets==2.19.0 nltk==3.8.1
 ```
-3. Run the SBATCH script from ```/run``` to submit the batch job to the Slurm workload. Make sure you are in the root directory. The command for executing the TSDAE script is:
+3. Run the SBATCH script from ```/root``` to submit the batch job to the Slurm workload. Make sure you are in the root directory. If this is your first time running the scripts then make sure that you have ```training=True``` set in the ```__main__``` for ```code/TSDAE.py``` or ```code/GPL.py```, respectively. The command for executing the TSDAE script is:
 ```
 sbatch run/tsdae_slurm.sh
 ```
@@ -37,4 +37,9 @@ And for GPL, respectively:
 sbatch run/gpl_slurm.sh
 ```
 
+4. Evaluate the model
 
+After a succesful batch job, set the ```training=False``` to run the evaluation on the trained model, and run the same SBATCH from the previous step.
+
+5. Results and debugging
+Navigate to ```code/logs``` where we have generated ```.out``` and ```.err``` files for our model with the respective batch job ID. The output file has the results of a succesful evaluation.
