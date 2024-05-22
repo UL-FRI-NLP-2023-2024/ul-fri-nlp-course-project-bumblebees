@@ -1,5 +1,6 @@
 
 import json
+import gc
 import nltk
 from sentence_transformers import SentenceTransformer, losses
 from sentence_transformers.datasets import DenoisingAutoEncoderDataset
@@ -20,7 +21,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # Clear cuda cache to avoid running out of memory
 if device == "cuda":
     torch.cuda.empty_cache()
-
+gc.collect()
 # Set parameters:
 with open("code/config/tsdae_params.json", "r") as f:
     params = json.load(f)
@@ -45,11 +46,14 @@ output_dim = params_clf["output_dim"]
 
 # Models:
 # model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-model_name = "EMBEDDIA/sloberta"
+# model_name = "EMBEDDIA/sloberta"
+model_name="models/paraphrase_MINILM_gpl_boshko.pth"
 # clf_name = "models/classifier_tsdae.pth"
 # save_name = "models/paraphrase_MiniLM_tsdae.pth"
-clf_name = "models/classifier_tsdae_sloberta.pth"
-save_name = "models/paraphrase_MiniLM_tsdae_sloberta.pth"
+# clf_name = "models/classifier_tsdae_sloberta.pth"
+# save_name = "models/paraphrase_MiniLM_tsdae_sloberta.pth"
+clf_name = "models/classifier_MiniLM_gpl_tsdae_boshkokoloski_run.pth"
+save_name = "models/paraphrase_MiniLM_gpl_tsdae_boshkokoloski_run.pth"
 
 
 def train():
@@ -59,11 +63,11 @@ def train():
 
     # Prepare base model (multilingual SBERT)
     model = SentenceTransformer(model_name).to(device)
-
+    model = nn.DataParallel(model, device_ids=[0,1])
     # Returns labels and text (corrupted and original sentence)
     train_data = DenoisingAutoEncoderDataset(train_text)
 
-    train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True, drop_last=True)
+    train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True, drop_last=True, num_workers=2, pin_memory=True)
     train_loss = losses.DenoisingAutoEncoderLoss(model, decoder_name_or_path=model_name, tie_encoder_decoder=False)
 
     model.fit(
@@ -87,9 +91,9 @@ def train_clf():
     val_embedds = fine_tuned_model.encode(val_text)
 
     train_dataset = ClassifyingDataset(train_embedds, train_labels)
-    train_dataloader = DataLoader(train_dataset, batch_size=batch_size_clf, shuffle=True, drop_last=True)
+    train_dataloader = DataLoader(train_dataset, batch_size=batch_size_clf, shuffle=True, drop_last=True, num_workers=2, pin_memory=True)
     val_dataset = ClassifyingDataset(val_embedds, val_labels)
-    val_dataloader = DataLoader(val_dataset, batch_size=batch_size_clf, shuffle=False)
+    val_dataloader = DataLoader(val_dataset, batch_size=batch_size_clf, shuffle=False, num_workers=2, pin_memory=True)
 
     # Initializing classifying model, loss and optimizer:
     model = Classifier(input_dim, output_dim).to(device)
@@ -115,7 +119,7 @@ def eval(test_text=None, test_labels=None, test_batch_size=1):
 
 
 if __name__ == "__main__":
-    training = False
+    training = True
     if training:
         train()
         train_clf()
