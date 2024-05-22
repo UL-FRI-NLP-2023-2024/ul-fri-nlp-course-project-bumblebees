@@ -62,8 +62,9 @@ def train():
     train_text, _, _, _ = prepare_dataset(train=True)
 
     # Prepare base model (multilingual SBERT)
-    model = SentenceTransformer(model_name).to(device)
+    model = SentenceTransformer(model_name)
     model = nn.DataParallel(model, device_ids=[0,1])
+    model = model.to(device)
     # Returns labels and text (corrupted and original sentence)
     train_data = DenoisingAutoEncoderDataset(train_text)
 
