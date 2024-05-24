@@ -34,7 +34,6 @@ def train_classifier(train_dataloader, val_dataloader, model, criterion, optimiz
         model.train()
         all_loss = 0.0
         for embds, labels in train_dataloader:
-            # morde from_numpy
             embds, labels = embds.to(device), labels.to(device).long()
             optimizer.zero_grad()
             outputs = model(embds)

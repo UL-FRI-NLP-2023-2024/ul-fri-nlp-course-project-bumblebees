@@ -31,14 +31,15 @@ output_dim = params_clf["output_dim"]
 base_model_name = "EMBEDDIA/sloberta"
 
 #clf_name = "models/classifier_gpl.pth"
-clf_name = "models/classifier_gpl_boshko_sloberta.pth"
 #clf_name = "models/classifier_gpl_boshko.pth"
-save_name ="models/paraphrase_MiniLM_gpl_boshko_sloberta.pth"
+clf_name = "models/classifier_gpl_boshko_sloberta.pth"
+
 #save_name = "models/paraphrase_MiniLM_gpl.pth"
 #save_name = "models/paraphrase_MINILM_gpl_boshko.pth"
+save_name ="models/paraphrase_MiniLM_gpl_boshko_sloberta.pth"
 
-#T5_name = "doc2query/msmarco-14langs-mt5-base-v1" # does not contain Slovene
-T5_name = "bkoloski/slv_doc2query"
+# T5_name = "doc2query/msmarco-14langs-mt5-base-v1" # does not contain Slovene
+T5_name = "bkoloski/slv_doc2query" # "boshko" in names
 negative_mining_name = ["msmarco-distilbert-base-v3", "msmarco-MiniLM-L-6-v3"] # same as default
 cross_encoder_name = "cross-encoder/ms-marco-MiniLM-L-6-v2" # same as default
 
@@ -66,7 +67,6 @@ def train():
                 # Iteratively write lines to the JSON corpus.jsonl file
                 jsonl.write(json.dumps(line)+'\n')
 
-    # TODO: check how much should be negatives_per_query
     gpl.train(
         path_to_generated_data='data',
         base_ckpt=base_model_name,
@@ -92,7 +92,7 @@ def train_clf():
 
     fine_tuned_model = SentenceTransformer(save_name).to(device)
 
-    # Encode data to get 384 len embeddings and train classifier for 3 len embeddings
+    # Encode data to get 384 (or 768 for SloBERTa) len embeddings and train classifier for 3 len embeddings:
     train_embedds = fine_tuned_model.encode(train_text)
     val_embedds = fine_tuned_model.encode(val_text)
 
@@ -127,7 +127,6 @@ def eval(test_text=None, test_labels=None, test_batch_size=1):
 
 if __name__=='__main__':
     training = True
-    #training = False
     if training:
         train()
         train_clf()

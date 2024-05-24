@@ -40,7 +40,6 @@ def clf_name(n):
     #return f"models/classifier_gpl_embeddia_boshko.pth_{n}" #GPL base sloberta nad t5 slo (boshko)
 
 
-
 def train_clf(n, train_text, train_labels, val_text, val_labels):
     print(f"Starting to train the classifier for number of steps {n}.")
     model_name = base_model_name(n)
@@ -48,7 +47,7 @@ def train_clf(n, train_text, train_labels, val_text, val_labels):
 
     fine_tuned_model = SentenceTransformer(model_name).to(device)
 
-    # Encode data to get 384 len embeddings (or 768 foajar SloBERTa) and train classifier for 3 len embeddings
+    # Encode data to get 384 len embeddings (or 768 for SloBERTa) and train classifier for 3 len embeddings:
     train_embedds = fine_tuned_model.encode(train_text)
     val_embedds = fine_tuned_model.encode(val_text)
 
@@ -93,12 +92,12 @@ if __name__=='__main__':
 
     for i in range(1, steps+1):
         n = i * gpl_step_size
-        #train_clf(n, train_text, train_labels, val_text, val_labels)
+        train_clf(n, train_text, train_labels, val_text, val_labels)
 
-        # F1 nad učnimi podatki:
+        # F1 on train data:
         train_f1 = eval(n, train_text, train_labels, set="train")
         all_train_f1.append((n,train_f1))
-        # F1 nad testnimi podatki:
+        # F1 on test data:
         f1 = eval(n, test_text, test_labels, set="test")
         all_f1.append((n,f1))
 

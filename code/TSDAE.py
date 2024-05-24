@@ -1,7 +1,6 @@
 
 import json
 import gc
-import nltk
 from sentence_transformers import SentenceTransformer, losses
 from sentence_transformers.datasets import DenoisingAutoEncoderDataset
 import torch
@@ -12,8 +11,6 @@ import torch.nn as nn
 from utils import prepare_dataset, predictions, calculate_measures
 from classifier import Classifier, ClassifyingDataset, train_classifier
 
-nltk.download('punkt')
-
 
 # Determine device:
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -22,6 +19,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 if device == "cuda":
     torch.cuda.empty_cache()
 gc.collect()
+
 # Set parameters:
 with open("code/config/tsdae_params.json", "r") as f:
     params = json.load(f)
@@ -32,6 +30,7 @@ with open("code/config/classifier_params.json", "r") as f:
 batch_size = params["batch_size"]
 lr = params["lr"]
 epochs = params["epochs"]
+n_workers = 1
 
 # Classifier:
 batch_size_clf = params_clf["batch_size"]
@@ -40,20 +39,19 @@ epochs_clf = params_clf["epochs"]
 input_dim = params_clf["input_dim"]
 output_dim = params_clf["output_dim"]
 
-# clf_name = "models/classifier_gpl_boshko_sloberta.pth"
-#clf_name = "models/classifier_gpl_boshko.pth"
-# save_name ="models/paraphrase_MiniLM_gpl_boshko_sloberta.pth"
-
 # Models:
 # model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-# model_name = "EMBEDDIA/sloberta"
-model_name="models/paraphrase_MINILM_gpl_boshko.pth"
+model_name = "EMBEDDIA/sloberta"
+# model_name="models/paraphrase_MINILM_gpl_boshko.pth" # for fine-tuning GPL fine-tuned model with TSDAE
+
 # clf_name = "models/classifier_tsdae.pth"
+clf_name = "models/classifier_tsdae_sloberta.pth"
+# clf_name = "models/classifier_MiniLM_gpl_tsdae_boshkokoloski_run.pth"
+
 # save_name = "models/paraphrase_MiniLM_tsdae.pth"
-# clf_name = "models/classifier_tsdae_sloberta.pth"
-# save_name = "models/paraphrase_MiniLM_tsdae_sloberta.pth"
-clf_name = "models/classifier_MiniLM_gpl_tsdae_boshkokoloski_run.pth"
-save_name = "models/paraphrase_MiniLM_gpl_tsdae_boshkokoloski_run.pth"
+save_name = "models/paraphrase_MiniLM_tsdae_sloberta.pth"
+# save_name ="models/paraphrase_MiniLM_gpl_boshko_sloberta.pth"
+# save_name = "models/paraphrase_MiniLM_gpl_tsdae_boshkokoloski_run.pth"
 
 
 def train():
@@ -63,12 +61,13 @@ def train():
 
     # Prepare base model (multilingual SBERT)
     model = SentenceTransformer(model_name)
-    model = nn.DataParallel(model, device_ids=[0,1])
+    # model = nn.DataParallel(model, device_ids=[0,1])
     model = model.to(device)
+
     # Returns labels and text (corrupted and original sentence)
     train_data = DenoisingAutoEncoderDataset(train_text)
 
-    train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True, drop_last=True, num_workers=2, pin_memory=True)
+    train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True, drop_last=True, num_workers=n_workers, pin_memory=True)
     train_loss = losses.DenoisingAutoEncoderLoss(model, decoder_name_or_path=model_name, tie_encoder_decoder=False)
 
     model.fit(
@@ -87,7 +86,7 @@ def train_clf():
 
     fine_tuned_model = SentenceTransformer(save_name).to(device)
 
-    # Encode data to get 384 len embeddings and train classifier for 3 len embeddings
+    # Encode data to get 384 (or 768 with SloBERTa) len embeddings and train classifier for 3 len embeddings:
     train_embedds = fine_tuned_model.encode(train_text)
     val_embedds = fine_tuned_model.encode(val_text)
 

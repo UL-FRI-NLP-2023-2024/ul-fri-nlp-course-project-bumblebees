@@ -61,11 +61,6 @@ def prepare_dataset(train):
     dataset_len = len(dataset['train'])
     n_train = round(0.7 * dataset_len)
     n_val = round(0.1 * dataset_len)
-
-    # Use less data for testing code:
-    # n_train = 1000
-    # n_val = 100
-    # end = 1400
     
     # Train and validation set:
     if train:

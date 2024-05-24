@@ -33,8 +33,6 @@
 \usepackage{color, colortbl}
 \definecolor{Blue}{rgb}{0.8549,0.9098,0.9882}
 \definecolor{Red}{rgb}{0.9725,0.8078,0.8}
-\definecolor{Yellow}{rgb}{0.9961,0.9463,0.79688}
-\definecolor{Gray}{rgb}{0.9098,0.9098,0.9137}
 
 
 %----------------------------------------------------------------------------------------
@@ -90,8 +88,6 @@ Methods like SBERT are used for deriving sentence embeddings, but often do not p
 \section*{Introduction}
 
 \iffalse
-	Uvodni zapis - slabosti SBERT-a in podobnih metod, zakaj se uporablja TSDAE in GPL (v povezavi s prilagoditvijo domene). Osredotočili se bomo na "domain adaptation" za slovenski jezik, pri čemer bomo metode testirali nad problemom "sentimental analysis" (nekako povežemo besedilo na problem klasifikacija pri čustvih). Cilj projekta je bila implementacija metod TSDAE, GPL, s katerimi finetunamo SBERT (BERT+pooling), in testiranje metod ter primerjava rezultatov nad problemom klasifikacije stavkov v eno izmed "pos", "neg", "neutral". Opazovali smo tudi izbrane parametre tekom učenja posameznega pristopa.
-
 	In the Introduction section you should write about the
 	relevance of your work (what is the purpose of the project,
 	what will we solve) and about related work (what solutions
@@ -262,7 +258,6 @@ We train the model for 140 000 steps, with the batch size set to 32, generating 
 
 \section*{Results}
 
-% TO DO:
 % Use the results section to present the final results of your work. Present the results in a objective and scientific fashion. Use visualisations to convey your results in a clear and efficient manner. When comparing results between various techniques use appropriate statistical methodology.
 
 \subsection*{\large{1. Paraphrase-multilingual-MiniLM}}
@@ -361,8 +356,6 @@ Results, compared to the base model, are presented in Table~\ref{tab3}.
 \label{tab3}
 \end{table}
 
-% TODO: REZULTATE MORAMO ŠE POKOMENTIRATI
-
 
 \subsection*{Intermediate models in GPL}
 \label{intermediate-paraphrase}
@@ -372,13 +365,13 @@ Since we used the \textit{gpl}\footnote{https://pypi.org/project/gpl/} library f
     \centering
     \begin{minipage}{0.5\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{GPL__paraphrase_train.png}
+        \includegraphics[width=\linewidth]{graphs/GPL_14langs_paraphrase_train.png}
         \caption{F1 score on \textit{train} set evaluated on models, obtained during fine-tuning with the GPL method with {\it msmarco-14langs-mt5-base-v1} \cite{msmarco14langs} for the T5 model.}
 		\label{fig:gpl-versions-train}
     \end{minipage}\hfill
     \begin{minipage}{0.5\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{GPL__paraphrase_test.png}
+        \includegraphics[width=\linewidth]{graphs/GPL_14langs_paraphrase_test.png}
         \caption{F1 score on \textit{test} set evaluated on models, obtained during fine-tuning with the GPL method with {\it msmarco-14langs-mt5-base-v1} \cite{msmarco14langs} for the T5 model.}
 		\label{fig:gpl-versions}
     \end{minipage}
@@ -388,23 +381,22 @@ Since we used the \textit{gpl}\footnote{https://pypi.org/project/gpl/} library f
     \centering
     \begin{minipage}{0.5\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{GPL_SLO__paraphrase_train.png}
+        \includegraphics[width=\linewidth]{graphs/GPL_SLO_paraphrase_train.png}
         \caption{F1 score on \textit{train} set evaluated on models, obtained during fine-tuning with the GPL method with {\it slv\_doc2query}~\cite{boshko} for the T5 model.}
 		\label{fig:gpl-slo-versions-train}
     \end{minipage}\hfill
     \begin{minipage}{0.5\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{GPL_SLO__paraphrase_test.png}
+        \includegraphics[width=\linewidth]{graphs/GPL_SLO_paraphrase_test.png}
         \caption{F1 score on \textit{test} set evaluated on models, obtained during fine-tuning with the GPL method with {\it slv\_doc2query}~\cite{boshko} for the T5 model.}
 		\label{fig:gpl-slo-versions}
     \end{minipage}
 \end{figure}
 
-% REZULTATE MORAMO ŠE POKOMENTIRATI
-
 From the graphs we notice, that the F1 score is lower than the base model for both variants and for all intermediate models. We notice that lowering the number of steps for GPL could results in better performance. Since the curves for the train and test datasets look quite similar, we are unsure if the drop of F1 score in Figure~\ref{fig:gpl-versions-train} between 70k and 110k steps is due to overfitting.
 
 
+% ---...---...---
 
 \subsection*{\large{2. SloBERTa}}
 We decided to also fine-tune and evaluate a different base model, that is {\it SloBERTa}~\cite{sloberta}. The model is monolingual and was trained only on Slovenian datasets. In this section we compared the next models:
@@ -471,8 +463,6 @@ Results, compared to the base model, are presented in Table~\ref{tab5}.
 \label{tab5}
 \end{table}
 
-% REZULTATE MORAMO ŠE POKOMENTIRATI
-
 
 \subsection*{Intermediate models in GPL}
 As explained in the case of {\it paraphrase-multilingual-MiniLM-L12-v2} model, we extracted the intermediate models when fine-tuning with the GPL method. A model was saved every 10 000 steps, thus resulting in 13 intermediate and one final model. A classifier was trained for each of the models and evaluated on the train and test set of the SentiNews dataset~\cite{sentiNews}. The results (F1 score) are shown in Figure~\ref{fig:gpl-sloberta-versions-train} and Figure~\ref{fig:gpl-sloberta-versions} for GPL and in Figure~\ref{fig:gpl-sloberta-slo-versions-train} and Figure~\ref{fig:gpl-sloberta-slo-versions} for $\text{GPL}_{SLO}$.
@@ -481,13 +471,13 @@ As explained in the case of {\it paraphrase-multilingual-MiniLM-L12-v2} model, w
     \centering
     \begin{minipage}{0.5\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{GPL__SloBERTa_train.png}
+        \includegraphics[width=\linewidth]{graphs/GPL_14langs_SloBERTa_train.png}
         \caption{F1 score on \textit{train} set evaluated on models, obtained during fine-tuning with the GPL method with {\it msmarco-14langs-mt5-base-v1} \cite{msmarco14langs} for the T5 model.}
 		\label{fig:gpl-sloberta-versions-train}
     \end{minipage}\hfill
     \begin{minipage}{0.5\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{GPL__SloBERTa_test.png}
+        \includegraphics[width=\linewidth]{graphs/GPL_14langs_SloBERTa_test.png}
         \caption{F1 score on \textit{test} set evaluated on models, obtained during fine-tuning with the GPL method with {\it msmarco-14langs-mt5-base-v1} \cite{msmarco14langs} for the T5 model.}
 		\label{fig:gpl-sloberta-versions}
     \end{minipage}
@@ -497,19 +487,17 @@ As explained in the case of {\it paraphrase-multilingual-MiniLM-L12-v2} model, w
     \centering
     \begin{minipage}{0.5\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{GPL_SLO__SloBERTa_train.png}
+        \includegraphics[width=\linewidth]{graphs/GPL_SLO_SloBERTa_train.png}
         \caption{F1 score on \textit{train} set evaluated on models, obtained during fine-tuning with the GPL method with {\it slv\_doc2query}~\cite{boshko} for the T5 model.}
 		\label{fig:gpl-sloberta-slo-versions-train}
     \end{minipage}\hfill
     \begin{minipage}{0.5\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{GPL_SLO__SloBERTa_test.png}
+        \includegraphics[width=\linewidth]{graphs/GPL_SLO_SloBERTa_test.png}
         \caption{F1 score on \textit{test} set evaluated on models, obtained during fine-tuning with the GPL method with {\it slv\_doc2query}~\cite{boshko} for the T5 model.}
 		\label{fig:gpl-sloberta-slo-versions}
     \end{minipage}
 \end{figure}
-
-% REZULTATE MORAMO ŠE POKOMENTIRATI
 
 We notice that the best F1 score is given by training $\text{GPL}_{SLO}$ for 20 000 steps. This value is almost as good
 as the base model F1 score, but doesn't surpass it. Comparing \ref*{fig:gpl-slo-sloberta-versions} and \ref*{fig:gpl-slo-versions}
