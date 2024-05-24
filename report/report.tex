@@ -47,16 +47,16 @@
 %\Archive{Final report}
 
 % Article title
-\PaperTitle{Unsupervised Domain adaptation for Sentence Classification}
+\PaperTitle{Unsupervised Domain Adaptation for Sentence Classification}
 
 % Authors (student competitors) and their info
-\Authors{Veronika Matek, Karmen Frank and Luka Mihelič}
+\Authors{Karmen Frank, Veronika Matek and Luka Mihelič}
 
 % Advisors
 \affiliation{\textit{Advisors: Boshko Koloski, Aleš Žagar, Slavko Žitnik}}
 
 % Keywords
-\Keywords{Domain Adaptation, TSDAE, GPL, SBERT, Sentence Classification}
+\Keywords{Domain Adaptation, TSDAE, GPL, SBERT, Sentiment Classification}
 \newcommand{\keywordname}{Keywords}
 
 
@@ -136,7 +136,7 @@ where $n$ is the sentence embeddings' dimension and $k$ number of labels.
 
 Transformer-based Sequential Denoising Auto-Encoder (TSDAE) is a state-of-the-art unsupervised method used for domain adaptation with an encoder-decoder architecture. A shortcoming of previous sentence embedding techniques like SBERT is the lack of domain knowledge. Fine-tuning a model like this with TSDAE can adapt our model to a specific domain without any labeled data, as this is hard and expensive to acquire~\cite{wang-etal-2021-tsdae-using}.
 
-Before training the model, TSDAE corrupts the input sentences, for example by deleting or swapping words, and encodes them to a fixed size vector. The goal of the decoder is to reconstruct the vectors of the original input by prediciting what was changed. It is important to note that the decoder has no context as it doesn't have access to other sentence embeddings and thus creates a bottleneck~\cite{wang-etal-2021-tsdae-using}. This architecture can be seen in Figure~\ref{fig:tsdae}.
+Before training the model, TSDAE corrupts the input sentences, for example by deleting or swapping words, and encodes them to a fixed size vector. The goal of the decoder is to reconstruct the vectors of the original input by predicting what was changed. It is important to note that the decoder has no context as it doesn't have access to other sentence embeddings and thus creates a bottleneck~\cite{wang-etal-2021-tsdae-using}. This architecture can be seen in Figure~\ref{fig:tsdae}.
 
 \begin{figure}[ht]\centering
 	\vspace{12 pt}
@@ -146,7 +146,7 @@ Before training the model, TSDAE corrupts the input sentences, for example by de
 	\label{fig:tsdae}
 \end{figure}
 
-For the purpose of classifying Slovenian sentences based on their sentiment we fine-tune the SBERT model with TSDAE. We choose \textit{paraphrase-multilingual-MiniLM-L12-v2} for our base model. During training we use the DenoisingAutoEncoderLoss as our loss function, which expects pairs of original and corrupted sentences as the input. We train the model where the decoder attempts the reconstruction of the corrupted sentences and compare our results with the corpus~\cite{SentenceTransformers}.
+For the purpose of classifying Slovenian sentences based on their sentiment we fine-tune the SBERT model with TSDAE. During training we use the DenoisingAutoEncoderLoss as our loss function, which expects pairs of original and corrupted sentences as the input. We train the model where the decoder attempts the reconstruction of the corrupted sentences and compare our results with the corpus~\cite{SentenceTransformers}.
 
 % TSDAE has been shown by Wang, Reimers and Gurevych \cite{wang-etal-2021-tsdae-using} to outperform other unsupervised approaches and other supervised models, trained with a lot of labeled data. Many previous works were evaluated on Semantic Textual Similarity (STS) which might return good performance but it is unclear how it performs on specific domains \cite{wang-etal-2021-tsdae-using}.
 
@@ -185,7 +185,8 @@ where $N$ is the batch size, $\delta_i$ is defined in equation~\ref{eq:delta}, p
 
 
 \section*{Experiments}
-The experiments were conducted on two different sentence-transformer (SBERT architecture) base models, the first one being multilingual {\it paraphrase-multilingual-MiniLM-L12-v2}~\cite{reimers-2019-sentence-bert} and the second Slovenian {\it SloBERTa}~\cite{sloberta}. Both models were individually fine-tuned with the TSDAE and GPL method and combinations TSDAE+GPL and GPL+TSDAE.
+%TODO -> SBERT?
+The experiments were conducted on two different sentence-transformer (SBERT architecture) base models, the first one being multilingual {\it paraphrase-multilingual-MiniLM-L12-v2}~\cite{reimers-2019-sentence-bert} and the second Slovenian {\it SloBERTa}~\cite{sloberta}. Both models were individually fine-tuned with the TSDAE and GPL method as well as a combination of TSDAE+GPL.
 
 We used the SentiNews dataset \cite{sentiNews}, which contains 169k sentences from 10.4k documents, equiped with sentiment labels, in the Slovenian language. The sentiment labels can be neutral, negative or positive. A few examples of dataset's elements are shown in Table~\ref{tab1}.
 
@@ -239,7 +240,7 @@ For each model that we evaluated, a new classifier was trained. All of the class
 \subsection*{TSDAE}
 
 For TSDAE fine-tuning we first prepare our dataset split and then select our base model.
-We choose a sentence-transformer model {\it paraphrase-multilingual-MiniLM-L12-v2} as our starting point of training, which maps sentences to 384 dimensional vectors or sentence encodings. The second base model SloBERTa was also fine-tuned using this approach.
+We choose a sentence-transformer model {\it paraphrase-multilingual-MiniLM-L12-v2} as our starting point of training, which maps sentences to 384 dimensional vectors or sentence encodings. The second base model SloBERTa was also fine-tuned using this approach, but instead returns 768 dimensional embeddings.
 
 We take the training data of our split dataset and corrupt the sentences by removing words using the {\it DenoisingAutoEncoderDataset}. This function is used in combination with {\it DenoisingAutoEncoderLoss} which tries to reconstruct the sentences without noise.
 
@@ -329,10 +330,8 @@ since Slovenian was not a part of its training dataset. Because we are fine-tuni
 
 
 \subsection*{Combining the methods}
-Considering results obtained in \cite{GPL}, we decided to test a combination of the unsupervised adaptation techniques. The approach was:
-\begin{itemize}
-	\item additionally fine-tune the TSDAE model with the GPL method with {\it slv\_doc2query} for the T5 model.
-\end{itemize}
+Considering the results obtained in the GPL paper~\cite{GPL}, we decided to test a combination of the unsupervised adaptation techniques. The approach was to additionally fine-tune the TSDAE model with the GPL method with {\it slv\_doc2query} for the T5 model.
+
 
 We also considered testing the approach of further fine-tuning the $\text{GPL}_{SLO}$ model using the TSDAE method for 10 epochs, but we were unable to do so as we could not resolve an error in time. Results of TSDAE+$\text{GPL}_{SLO}$, compared to the base model, are presented in Table~\ref{tab3}.
 
@@ -355,7 +354,7 @@ We also considered testing the approach of further fine-tuning the $\text{GPL}_{
 \label{tab3}
 \end{table}
 
-The F1 score of TSDAE+$\text{GPL}_{SLO}$ is lower than the value achieved by the base model for 0.0677 or 12.01\%. When checking the results stated in Table~\ref{tab2}, we also notice that the combination of the two unsupervised fine-tuning methods performs worse than if the methods are used individually. Compared to TSDAE, the decrease in F1 score is 0.0297 or 5.65\%, while compared to $\text{GPL}_{SLO}$ the decrease is 0.0165 or 3.22\%. The worsened performance is most probably because of $\text{GPL}_{SLO}$ model overfitting the training dataset.
+The F1 score of TSDAE+$\text{GPL}_{SLO}$ is lower than the value achieved by the base model for 0.0677 or 12.01\%. When checking the results stated in Table~\ref{tab2}, we also notice that the combination of the two unsupervised fine-tuning methods performs worse than if the methods are used individually. Compared to TSDAE, the decrease in F1 score is 0.0297 or 5.65\%, while compared to $\text{GPL}_{SLO}$ the decrease is 0.0165 or 3.22\%. The worsened performance is most likely because of the $\text{GPL}_{SLO}$ model overfitting on the training dataset.
 
 
 \subsection*{Intermediate models in GPL}
@@ -394,7 +393,7 @@ Since we used the \textit{gpl}\footnote{https://pypi.org/project/gpl/} library f
     \end{minipage}
 \end{figure}
 
-From the graphs, it is evident that the F1 score is lower than the base model for both variants and for all intermediate models. We notice that lowering the number of steps for GPL (Figure~\ref{fig:gpl-versions}) could result in better performance, but this parameter would have to be chosen carefully and after further testing. The $\text{GPL}_{SLO}$ seems to perform the best at around 100,000 steps, on Figure~\ref{fig:gpl-slo-versions}, but its performance significantly declines at 130,000 and 140,000 steps. Since a similar, though less pronounced, decline is also observed in Figure~\ref{fig:gpl-slo-versions-train} of the training dataset, we are unsure if this is due to just overfitting.
+From the graphs, it is evident that the F1 score is lower than the base model for both variants and for all intermediate models. We notice on Figure~\ref{fig:gpl-versions} that lowering the number of steps used for training GPL could result in better performance, but this parameter would have to be chosen carefully and after further testing. The $\text{GPL}_{SLO}$ seems to perform the best at around 100,000 steps, as seen on Figure~\ref{fig:gpl-slo-versions}, but its performance significantly declines at 130,000 and 140,000 steps. Since a similar, though less pronounced, decline is also observed in Figure~\ref{fig:gpl-slo-versions-train} of the training dataset, we are unsure if this is due to just overfitting.
 
 
 % ---...---...---
@@ -408,7 +407,7 @@ We decided to also fine-tune and evaluate a different base model, that is {\it S
 	\item base model fine-tuned with the GPL method and \\{\it slv\_doc2query}~\cite{boshko} for the T5 model - denoted as $\text{GPL}_{SLO}$.
 \end{itemize}
 
-As in the case of {\it paraphrase-multilingual-MiniLM-L12-v2}, a new classifier was trained for each of the models. Evaluation was once again done on the test set of the SentiNews dataset~\cite{sentiNews}. The results are presented in Table~\ref{tab4}.
+As in the case of the {\it paraphrase-multilingual-MiniLM-L12-v2} base model, a new classifier was trained for each of the listed models. Evaluation was once again done on the test set of the SentiNews dataset~\cite{sentiNews}. The results are presented in Table~\ref{tab4}.
 
 \begin{table}[!h]
 	\footnotesize
@@ -434,10 +433,10 @@ As in the case of {\it paraphrase-multilingual-MiniLM-L12-v2}, a new classifier 
 
 Contrary to the results attained while working with the {\it paraphrase-multilingual-MiniLM-L12-v2} model, where using only the base model achieved the highest F1 score, the {\it SloBERTa} base model is surpassed by its TSDAE fine-tuned variant. The TSDAE model's F1 score is higher than the base model's ({\it SloBERTa}) for 0.0088 or 1.5\%. The improvement is small, but noticable.
 
-Interestingly, the GPL model performs better than the $\text{GPL}_{SLO}$ (the opposite happened with {\it paraphrase-multilingual-MiniLM-L12-v2} model in Table~\ref{tab2}), although the difference between the two is only 3.28\% in F1 score. %We are uncertain about the reasoning behind this difference. One idea could be, that since the {\it SloBERTa} model is already doing very well with the Slovene language, it is not influenced as much by the queries provided by the T5 model. Meanwhile with the Slovenian T5, the queries are probably quite good and thus influence the fine-tuning a lot more. Je tulk sigurn za slovenščino, da se pol nit ne sredotoča tulku na querije, aka vpliv T5 modela, ki ni za slovenščino je manjpši. Medtem ku pa so pr slovenskm T5 tud queriji, in nima base model sam po sebi tulk vpliva - vemo pa, da ma base model sam bulše rezultate
+Interestingly, the GPL model performs better than the $\text{GPL}_{SLO}$ (the opposite happened with {\it paraphrase-multilingual-MiniLM-L12-v2} model in Table~\ref{tab2}), although the difference between the two is only 3.28\% in F1 score.
 Comparing the GPL model to the base model reveals a decrease in the F1 score of 0.0232 or 3,95\%.
 
-Despite the previously used base model {\it paraphrase-\\multilingual-MiniLM-L12-v2} being trained on a training dataset of 50 languages that included Slovenian, the monolingual base model {\it SloBERTa} performs better, as it is solely trained for Slovene. Our sentiment classification problem is done on Slovenian sentences, thus making the {\it SloBERTa} model better suited for our language task. This improved performance is evident when comparing Table~\ref*{tab2} and Table~\ref*{tab4}. Comparing the scores of {\it SloBERTa} model, TSDAE and GPL to {\it paraphrase-\\multilingual-MiniLM-L12-v2} model (its F1 score of 0.5637 is stated in Table~\ref{tab2}), our observations are:
+Despite the previously used base model {\it paraphrase-\\multilingual-MiniLM-L12-v2} being trained on a training dataset of 50 languages that included Slovenian, the monolingual base model {\it SloBERTa} performs better, as it is solely trained for Slovene. Our sentiment classification problem is done on Slovenian sentences, thus making the {\it SloBERTa} model better suited for our language task. This improved performance is evident when comparing Table~\ref{tab2} with Table~\ref{tab4}. Comparing the scores of the {\it SloBERTa} model, TSDAE and GPL to the {\it paraphrase-multilingual-MiniLM-L12-v2} model (its F1 score of 0.5637 is stated in Table~\ref{tab2}), our observations are:
 \begin{itemize}
 	\item {\it SloBERTa}'s F1 score is improved by 4.08\%,
 	\item TSDAE's F1 score is improved by 5.64\% and
@@ -446,12 +445,9 @@ Despite the previously used base model {\it paraphrase-\\multilingual-MiniLM-L12
 
 
 \subsection*{Combining the methods}
-A combination of the unsupervised adaptation techniques was tested. The approach was:
-\begin{itemize}
-	\item additionally fine-tune the TSDAE model with the GPL method with {\it slv\_doc2query} for the T5 model.
-\end{itemize}
+A combination of the unsupervised adaptation techniques was tested. The approach was to additionally fine-tune the TSDAE model with the GPL method using {\it slv\_doc2query} for the T5 model.
 
-Similarly as with {\it paraphrase-\\multilingual-MiniLM-L12-v2}, we also considered testing the approach of further fine-tuning the $\text{GPL}_{SLO}$ model using the TSDAE method for 10 epochs, but we were unable to do so because of lack of time. Results of TSDAE+$\text{GPL}_{SLO}$, compared to the base model, are presented in Table~\ref{tab5}.
+Similarly as with {\it paraphrase-multilingual-MiniLM-L12-v2}, we also considered testing the approach of further fine-tuning the $\text{GPL}_{SLO}$ model using the TSDAE method for 10 epochs, but we were unable to do so because of lack of time. Results of TSDAE+$\text{GPL}_{SLO}$, compared to the base model, are presented in Table~\ref{tab5}.
 
 \begin{table}[!h]
 	\footnotesize
@@ -476,7 +472,7 @@ The combination TSDAE+$\text{GPL}_{SLO}$ does not yield a higher F1 score than t
 
 
 \subsection*{Intermediate models in GPL}
-As explained in the case of {\it paraphrase-multilingual-MiniLM-L12-v2} model, we extracted the intermediate models when fine-tuning with the GPL method. A model was saved every 10,000 steps, thus resulting in 13 intermediate and one final model. A classifier was trained for each of the models and evaluated on the train and test set of the SentiNews dataset~\cite{sentiNews}. The results (F1 score) are shown in Figure~\ref{fig:gpl-sloberta-versions-train} and Figure~\ref{fig:gpl-sloberta-versions} for GPL and in Figure~\ref{fig:gpl-sloberta-slo-versions-train} and Figure~\ref{fig:gpl-sloberta-slo-versions} for $\text{GPL}_{SLO}$.
+As explained in the case of {\it paraphrase-multilingual-MiniLM-L12-v2} model, we extracted the intermediate models when fine-tuning with the GPL method. A model was saved every 10,000 steps, thus resulting in 13 intermediate and one final model. A classifier was trained for each of the models and evaluated on the train and test set of the SentiNews dataset~\cite{sentiNews}. The results (F1 scores) are shown in Figure~\ref{fig:gpl-sloberta-versions-train} and Figure~\ref{fig:gpl-sloberta-versions} for GPL and in Figure~\ref{fig:gpl-sloberta-slo-versions-train} and Figure~\ref{fig:gpl-sloberta-slo-versions} for $\text{GPL}_{SLO}$.
 
 \begin{figure}
     \centering
@@ -510,10 +506,11 @@ As explained in the case of {\it paraphrase-multilingual-MiniLM-L12-v2} model, w
     \end{minipage}
 \end{figure}
 
-We notice that the best F1 score is given by training $\text{GPL}_{SLO}$ for 20,000 steps. This value is almost as good
-as the base model F1 score, but doesn't surpass it. Comparing \ref*{fig:gpl-slo-sloberta-versions} and \ref*{fig:gpl-slo-versions}
-we clearly see how better our model performs by simply changing the base model. Training for more that 120,000 steps probably
-leads into overfitting, despite the suggested~\cite{GPL} 140,000 steps.
+Similarly as before we notice that smaller number of training sets can give us better results than having more steps. We notice that the best F1 score is given by training $\text{GPL}_{SLO}$ for 10,000 steps. This value is almost as good
+as the base model F1 score, but doesn't surpass it. Comparing Figure~\ref{fig:gpl-slo-versions} with Figure~\ref{fig:gpl-sloberta-slo-versions}
+we clearly see how better our model performs by simply changing the base model.
+Training for more than 100,000 steps could probably lead into overfitting based solely on Figure~\ref{fig:gpl-sloberta-slo-versions}, despite the GPL article~\cite{GPL} suggested 140,000 steps, but the model evaluated on the training dataset, as seen on Figure~\ref{fig:gpl-sloberta-slo-versions-train}, once again disputes this fact.
+To further check when the model starts to overfit, we should've added more steps to the fine-tuning process, for example something such as 200,000.
 
 
 
@@ -534,15 +531,15 @@ leads into overfitting, despite the suggested~\cite{GPL} 140,000 steps.
 
 The tested unsupervised fine-tuning methods TSDAE and GPL did not perform as well as it was indicated in \cite{wang-etal-2021-tsdae-using} and \cite{GPL} for our Slovenian dataset and sentiment classification problem. The F1 scores we achieved on the test set with the fine-tuned models were almost all lower than the F1 scores of the base models. The only exception was the TSDAE fine-tuned {\it SloBERTa}~\cite{sloberta} model, which improved the base model {\it SloBERTa}'s score by 1.5\%.
 
-Comparing the two base models, {\it paraphrase-multilingual-MiniLM-L12-v2}~\cite{reimers-2019-sentence-bert} and {\it SloBERTa}, we noticed that the latter performs better for sentiment classification of Slovenian sentences. The {\it SloBERTa} surpassed the {\it paraphrase-multilingual-MiniLM-L12-v2} F1 score by 4.08\%. This is most probably due to {\it SloBERTa} being trained only on Slovenian datasets, while for the {\it paraphrase-multilingual-MiniLM-L12-v2}, the Slovene language was only a part of the training set.
+Comparing the two base models, {\it paraphrase-multilingual-MiniLM-L12-v2}~\cite{reimers-2019-sentence-bert} and {\it SloBERTa}, we noticed that the latter performs better for sentiment classification of Slovenian sentences. The {\it SloBERTa} base model surpassed the {\it paraphrase-multilingual-MiniLM-L12-v2}'s F1 score by 4.08\%. This is most probably due to {\it SloBERTa} being trained only on Slovenian datasets, while for the {\it paraphrase-multilingual-MiniLM-L12-v2}, the Slovene language was only a part of the training set.
 
-Unfortunately, the combination $\text{GPL}_{SLO}$+TSDAE could not be evaluated for neither of the base models. Comparing it to the combination TSDAE+$\text{GPL}_{SLO}$, that we were able to fine-tune and test, could prove interesting.
+Unfortunately, the combination $\text{GPL}_{SLO}$+TSDAE fine-tuning could not be evaluated for neither of the base models. Comparing it to the combination TSDAE+$\text{GPL}_{SLO}$, that we were able to fine-tune and test, could prove interesting.
 
 The next logical step would be testing the methods on a much more specific domain. The SentiNews dataset was built from different Slovenian news, resulting in a vocabulary that is quite general. If we were to use a very specific dataset, we think that the comparison between the fine-tuned models with TSDAE and GPL method and just the base model might differ from the results achieved in this project.
 
-Since gathering labeled data from specific domains in Slovene language may be sprase, the unsupervised learning we tested could prove useful for such purposes. For example, if we fine-tuned a chosen base model with the TSDAE or GPL method (using {\it msmarco-14langs-mt5-base-v1}~\cite{msmarco14langs} or {\it slv\_doc2query}~\cite{boshko} for the T5 model) on a sentiment dataset, which included Slovene sentences with reviews only for a specific product or range of products in the same category, then the model could achieve better results.
+Since gathering labeled data from specific domains in Slovene language may be sprase, the unsupervised learning we tested could prove useful for such purposes. For example, if we fine-tuned a chosen base model with the TSDAE or GPL method (using {\it msmarco-14langs-mt5-base-v1}~\cite{msmarco14langs} or {\it slv\_doc2query}~\cite{boshko} for the T5 model) on a sentiment dataset, which included Slovene sentences with reviews only for a specific product or range of products in the same category, then the model could potentially achieve better results.
 
-The parameters of the proposed classifier in the project were not tested enough. Further experimenting with the number of epochs and the learning rate could lead us to improved performance. We could also test the difference in performance with changing the GPL parameters, perhaps even testing the method with all of the models it uses being trained or fine-tuned specifically for the Slovene language.
+The parameters of the proposed classifier in the project were not tested enough. Further experimenting with the number of epochs and the learning rate could lead us to improved performance. We could also test the difference in performance with changing the GPL parameters, perhaps even testing the method with all of the models it uses for being trained or fine-tuned specifically for the Slovene language.
 
 
 %------------------------------------------------

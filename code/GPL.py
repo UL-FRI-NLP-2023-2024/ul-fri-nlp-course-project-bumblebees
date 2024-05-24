@@ -31,15 +31,17 @@ output_dim = params_clf["output_dim"]
 base_model_name = "EMBEDDIA/sloberta"
 
 #clf_name = "models/classifier_gpl.pth"
+clf_name = "models/classifier_gpl_sloberta.pth"
 #clf_name = "models/classifier_gpl_boshko.pth"
-clf_name = "models/classifier_gpl_boshko_sloberta.pth"
+#clf_name = "models/classifier_gpl_boshko_sloberta.pth"
 
 #save_name = "models/paraphrase_MiniLM_gpl.pth"
-#save_name = "models/paraphrase_MINILM_gpl_boshko.pth"
-save_name ="models/paraphrase_MiniLM_gpl_boshko_sloberta.pth"
+save_name = "models/gpl_sloberta.pth"
+#save_name = "models/gpl_boshko.pth"
+#save_name ="models/gpl_boshko_sloberta.pth"
 
-# T5_name = "doc2query/msmarco-14langs-mt5-base-v1" # does not contain Slovene
-T5_name = "bkoloski/slv_doc2query" # "boshko" in names
+T5_name = "doc2query/msmarco-14langs-mt5-base-v1" # does not contain Slovene
+#T5_name = "bkoloski/slv_doc2query" # "boshko" in names
 negative_mining_name = ["msmarco-distilbert-base-v3", "msmarco-MiniLM-L-6-v3"] # same as default
 cross_encoder_name = "cross-encoder/ms-marco-MiniLM-L-6-v2" # same as default
 
